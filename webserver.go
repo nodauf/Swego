@@ -23,7 +23,9 @@ import "time"
 import "encoding/base64"
 import "./utils"
 
-var root_folder *string // TODO: Find a way to be cleaner !
+var root_folder *string
+var username *string
+var password *string
 var uses_gzip *bool
 
 const serverUA = ""
@@ -48,7 +50,7 @@ func min(x int64, y int64) int64 {
 
 func basicAuth(h http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-
+        fmt.Println(*root_folder)
 		w.Header().Set("WWW-Authenticate", `Basic realm="Restricted"`)
 
 		s := strings.SplitN(r.Header.Get("Authorization"), " ", 2)
@@ -69,7 +71,7 @@ func basicAuth(h http.HandlerFunc) http.HandlerFunc {
 			return
 		}
 
-		if pair[0] != "username" || pair[1] != "password" {
+		if pair[0] != *username || pair[1] != *password {
 			http.Error(w, "Not authorized", 401)
 			return
 		}
@@ -89,9 +91,11 @@ func main() {
 
         // Command line parsing
         bind := flag.String("bind", ":1718", "Bind address")
-        public := flag.String("public", "", "public folder")
-        private := flag.String("private", "private", "private folder with basic auth")
         root_folder = flag.String("root", cwd, "Root folder")
+        public := flag.String("public", "", "Default " + cwd + " public folder")
+        private := flag.String("private", "private", "Private folder with basic auth, default " + cwd + "/private")
+        username = flag.String("username", "admin", "Username for basic auth, default: admin")
+        password = flag.String("password", "notsecure", "Password for basic auth, default: notsecure")
         uses_gzip = flag.Bool("gzip", true, "Enables gzip/zlib compression")
 
         flag.Parse()
