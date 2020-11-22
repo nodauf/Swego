@@ -1,0 +1,196 @@
+package controllers
+
+import "net/http"
+import "net/url"
+import "path"
+import "os"
+import "fmt"
+import "io"
+import "time"
+import "mime"
+import "compress/gzip"
+import "compress/zlib"
+import "strconv"
+import "SimpleHTTPServer-golang/src/utils"
+import "container/list"
+import "html/template"
+
+const serverUA = ""
+const fs_maxbufsize = 4096 // 4096 bits = default page size on OSX
+
+func HandleFile(w http.ResponseWriter, req *http.Request) {
+        w.Header().Set("Server", serverUA)
+
+        filepath := path.Join((*Root_folder), path.Clean(req.URL.Path))
+        serveFile(filepath, w, req)
+
+}
+
+func serveFile(filepath string, w http.ResponseWriter, req *http.Request) {
+        // Opening the file handle
+        f, err := os.Open(filepath)
+        if err != nil {
+                http.Error(w, "404 Not Found : Error while opening the file.", 404)
+                return
+        }
+
+        defer f.Close()
+
+        // Checking if the opened handle is really a file
+        statinfo, err := f.Stat()
+        if err != nil {
+                http.Error(w, "500 Internal Error : stat() failure.", 500)
+                return
+        }
+
+        if statinfo.IsDir() { // If it's a directory, open it !
+                handleDirectory(f, w, req)
+                return
+        }
+
+        if (statinfo.Mode() &^ 07777) == os.ModeSocket { // If it's a socket, forbid it !
+                http.Error(w, "403 Forbidden : you can't access this resource.", 403)
+                return
+        }
+
+        // Manages If-Modified-Since and add Last-Modified (taken from Golang code)
+        if t, err := time.Parse(http.TimeFormat, req.Header.Get("If-Modified-Since")); err == nil && statinfo.ModTime().Unix() <= t.Unix() {
+                w.WriteHeader(http.StatusNotModified)
+                return
+        }
+        w.Header().Set("Last-Modified", statinfo.ModTime().Format(http.TimeFormat))
+
+        // Content-Type handling
+        query, err := url.ParseQuery(req.URL.RawQuery)
+
+        if err == nil && len(query["dl"]) > 0 { // The user explicitedly wanted to download the file (Dropbox style!)
+                w.Header().Set("Content-Type", "application/octet-stream")
+        } else {
+                // Fetching file's mimetype and giving it to the browser
+                if mimetype := mime.TypeByExtension(path.Ext(filepath)); mimetype != "" {
+                        w.Header().Set("Content-Type", mimetype)
+                } else {
+                        w.Header().Set("Content-Type", "application/octet-stream")
+                }
+        }
+        w.Header().Set("Cache-Control", "store, public, min-age=5, max-age=120")
+        // Manage Content-Range (TODO: Manage end byte and multiple Content-Range)
+        if req.Header.Get("Range") != "" {
+                start_byte := utils.ParseRange(req.Header.Get("Range"))
+
+                if start_byte < statinfo.Size() {
+                        f.Seek(start_byte, 0)
+                } else {
+                        start_byte = 0
+                }
+
+                w.Header().Set("Content-Range",
+                        fmt.Sprintf("bytes %d-%d/%d", start_byte, statinfo.Size()-1, statinfo.Size()))
+        }
+
+        // Manage gzip/zlib compression
+        output_writer := w.(io.Writer)
+
+        is_compressed_reply := false
+
+        if (*Uses_gzip) == true && req.Header.Get("Accept-Encoding") != "" {
+                encodings := utils.ParseCSV(req.Header.Get("Accept-Encoding"))
+
+                for _, val := range encodings {
+                        if val == "gzip" {
+                                w.Header().Set("Content-Encoding", "gzip")
+                                output_writer = gzip.NewWriter(w)
+
+                                is_compressed_reply = true
+
+                                break
+                        } else if val == "deflate" {
+                                w.Header().Set("Content-Encoding", "deflate")
+                                output_writer = zlib.NewWriter(w)
+
+                                is_compressed_reply = true
+
+                                break
+                        }
+                }
+        }
+
+        if !is_compressed_reply {
+                // Add Content-Length
+                w.Header().Set("Content-Length", strconv.FormatInt(statinfo.Size(), 10))
+        }
+
+        // Stream data out !
+        buf := make([]byte, utils.Min(fs_maxbufsize, statinfo.Size()))
+        n := 0
+        for err == nil {
+                n, err = f.Read(buf)
+                output_writer.Write(buf[0:n])
+        }
+
+        // Closes current compressors
+        switch output_writer.(type) {
+        case *gzip.Writer:
+                output_writer.(*gzip.Writer).Close()
+        case *zlib.Writer:
+                output_writer.(*zlib.Writer).Close()
+        }
+
+        f.Close()
+}
+
+func handleDirectory(f *os.File, w http.ResponseWriter, req *http.Request) {
+        names, _ := f.Readdir(-1)
+
+        // First, check if there is any index in this folder.
+        for _, val := range names {
+                if val.Name() == "index.html" {
+                        serveFile(path.Join(f.Name(), "index.html"), w, req)
+                        return
+                }
+        }
+
+        // Otherwise, generate folder content.
+        children_dir_tmp := list.New()
+        children_files_tmp := list.New()
+
+        for _, val := range names {
+                if val.Name()[0] == '.' {
+                        continue
+                } // Remove hidden files from listing
+
+                if val.IsDir() {
+                        children_dir_tmp.PushBack(val.Name())
+                } else {
+                        children_files_tmp.PushBack(val.Name())
+                }
+        }
+
+        // And transfer the content to the final array structure
+        children_dir := utils.CopyToArray(children_dir_tmp)
+        children_files := utils.CopyToArray(children_files_tmp)
+
+	err := renderTemplate(w,utils.Params{Name:req.URL.Path,Children_dir:children_dir,Children_files:children_files})
+	if err != nil {
+		fmt.Println(err)
+	}
+}
+
+func renderTemplate(w http.ResponseWriter, param utils.Params) error{
+        //tpl, err := template.New("tpl").Parse(dirlisting_tpl)
+        tpl := template.Must(template.ParseFiles("views/directoryListing.tpl"))
+        //if err != nil {
+        //        http.Error(w, "500 Internal Error : Error while generating directory listing.", 500)
+        //        return err
+        //}
+
+        data := utils.Dirlisting{Name: param.Name, ServerUA: serverUA,
+                Children_dir: param.Children_dir, Children_files: param.Children_files}
+
+        err := tpl.Execute(w,data)
+        if err != nil {
+                return err
+        }
+	return nil
+
+}
