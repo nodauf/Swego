@@ -183,22 +183,16 @@ func handleDirectory(f *os.File, w http.ResponseWriter, req *http.Request) {
         children_dir := utils.CopyToArray(children_dir_tmp)
         children_files := utils.CopyToArray(children_files_tmp)
 
-	err := renderTemplate(w,utils.Params{Name:req.URL.Path,Children_dir:children_dir,Children_files:children_files})
-	if err != nil {
-		fmt.Println(err)
+        data := utils.Dirlisting{Name: req.URL.Path, ServerUA: serverUA,
+                Children_dir: children_dir, Children_files: children_files}
+	    err := renderTemplate(w,"views/directoryListing.tpl",data)
+	    if err != nil {
+		    fmt.Println(err)
 	}
 }
 
-func renderTemplate(w http.ResponseWriter, param utils.Params) error{
-        //tpl, err := template.New("tpl").Parse(dirlisting_tpl)
-        tpl := template.Must(template.ParseFiles("views/directoryListing.tpl"))
-        //if err != nil {
-        //        http.Error(w, "500 Internal Error : Error while generating directory listing.", 500)
-        //        return err
-        //}
-
-        data := utils.Dirlisting{Name: param.Name, ServerUA: serverUA,
-                Children_dir: param.Children_dir, Children_files: param.Children_files}
+func renderTemplate(w http.ResponseWriter, view string,  data interface{}) error{
+        tpl := template.Must(template.ParseFiles(view))
 
         err := tpl.Execute(w,data)
         if err != nil {

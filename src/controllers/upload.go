@@ -1,10 +1,12 @@
 package controllers
 
-import "net/http"
-import "fmt"
-import "io"
-import "path"
-import "os"
+import (
+	"net/http"
+	"fmt"
+	"io"
+	"path"
+	"os"
+)
 
 func UploadFile(w http.ResponseWriter, r *http.Request) {
         fmt.Println(r.URL.Path)
@@ -44,5 +46,15 @@ func UploadFile(w http.ResponseWriter, r *http.Request) {
                 http.Error(w, "404 Not Found : Error while opening the file.", 404)
                 return
         }
-	fmt.Fprintf(w, "Successfully Uploaded File\n")
+		data := struct {
+			Directory string
+		}{
+			r.URL.Path,
+		}
+		err = renderTemplate(w , "views/upload.tpl", data)
+        if err != nil {
+                fmt.Print("Error while uploading: ")
+				fmt.Println(err)
+        }
+
 }
