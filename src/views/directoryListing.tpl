@@ -32,7 +32,7 @@ div.foot { font: 90% monospace; color: #787878; padding-top: 4px;}
 <tr><td class="n"><a href="{{.}}/">{{.}}/</a></td><td class="t">Directory</td><td class="dl"></td></tr>
 {{end}}
 {{range .Children_files}}
-<tr><td class="n"><a href="{{.}}">{{.}}</a></td><td class="t">&nbsp;</td><td class="dl"><a href="{{.}}?dl">Download</a></td></tr>
+<tr><td class="n"><a href="{{.}}">{{.}}</a></td><td class="t">&nbsp;</td><td class="dl"><a href="{{.}}?dl">Download</a> | <a href="{{.}}?dlenc">encrypted zip (pwd: infected)</a></td></tr>
 {{end}}
 </tbody>
 </table>

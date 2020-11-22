@@ -1,19 +1,22 @@
 package controllers
 
-import "net/http"
-import "net/url"
-import "path"
-import "os"
-import "fmt"
-import "io"
-import "time"
-import "mime"
-import "compress/gzip"
-import "compress/zlib"
-import "strconv"
-import "SimpleHTTPServer-golang/src/utils"
-import "container/list"
-import "html/template"
+import (
+    "net/http"
+    "net/url"
+    "path"
+    "os"
+    "fmt"
+    "io"
+    "time"
+    "mime"
+    "compress/gzip"
+    "compress/zlib"
+    "strconv"
+    "SimpleHTTPServer-golang/src/utils"
+    "container/list"
+    "html/template"
+    "strings"
+)
 
 const serverUA = ""
 const fs_maxbufsize = 4096 // 4096 bits = default page size on OSX
@@ -65,6 +68,16 @@ func serveFile(filepath string, w http.ResponseWriter, req *http.Request) {
 
         if err == nil && len(query["dl"]) > 0 { // The user explicitedly wanted to download the file (Dropbox style!)
                 w.Header().Set("Content-Type", "application/octet-stream")
+        }else if err == nil && len(query["dlenc"]) > 0{
+                w.Header().Set("Content-Type", "application/octet-stream")
+                filepathenc := utils.Encryptfile(f,"infected")
+                // Generate the request for the new file
+                newFile := strings.Split(req.URL.String(),"?")
+                newRequest, _ := http.NewRequest("GET", "http://"+req.Host+newFile[0], nil)
+                // Serve the new file (encrypted zip)
+                serveFile(filepathenc ,w , newRequest)
+                os.Remove(filepathenc)
+                return
         } else {
                 // Fetching file's mimetype and giving it to the browser
                 if mimetype := mime.TypeByExtension(path.Ext(filepath)); mimetype != "" {

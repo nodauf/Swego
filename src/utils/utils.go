@@ -1,8 +1,16 @@
 package utils
 
-import "strings"
-import "container/list"
+import(
+	"strings"
+	"container/list"
+	"io/ioutil"
+	"os"
+	"log"
+	"bytes"
+	"io"
 
+	"github.com/yeka/zip"
+)
 
 type Params struct {
 	Name string
@@ -86,3 +94,28 @@ func ParseRange(data string) int64 {
         return stop
 }
 
+func Encryptfile(f *os.File, password string) string{
+    fileInfo,_ :=f.Stat()
+    fileName := fileInfo.Name()
+    filePathName := f.Name()
+    body, err := ioutil.ReadFile(filePathName)
+    if err != nil {
+        log.Fatalf("unable to read file: %v", err)
+    }
+    fzip, err := os.Create(filePathName+".zip")
+    if err != nil {
+        log.Fatalln(err)
+    }
+    zipw := zip.NewWriter(fzip)
+    defer zipw.Close()
+    w, err := zipw.Encrypt(fileName, password, zip.StandardEncryption)
+    if err != nil {
+        log.Fatal(err)
+    }
+    _, err = io.Copy(w, bytes.NewReader(body))
+    if err != nil {
+        log.Fatal(err)
+    }
+    zipw.Flush()
+	return filePathName+".zip"
+}
