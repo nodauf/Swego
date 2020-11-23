@@ -51,7 +51,7 @@ func UploadFile(w http.ResponseWriter, r *http.Request) {
 		}{
 			r.URL.Path,
 		}
-		err = renderTemplate(w , "views/upload.tpl", data)
+		err = renderTemplate(w , "upload.tpl", data)
         if err != nil {
                 fmt.Print("Error while uploading: ")
 				fmt.Println(err)

@@ -16,6 +16,9 @@ import (
     "container/list"
     "html/template"
     "strings"
+    "log"
+
+    "github.com/GeertJohan/go.rice"
 )
 
 const serverUA = ""
@@ -185,16 +188,31 @@ func handleDirectory(f *os.File, w http.ResponseWriter, req *http.Request) {
 
         data := utils.Dirlisting{Name: req.URL.Path, ServerUA: serverUA,
                 Children_dir: children_dir, Children_files: children_files}
-	    err := renderTemplate(w,"views/directoryListing.tpl",data)
+	    err := renderTemplate(w,"directoryListing.tpl",data)
 	    if err != nil {
 		    fmt.Println(err)
 	}
 }
 
 func renderTemplate(w http.ResponseWriter, view string,  data interface{}) error{
-        tpl := template.Must(template.ParseFiles(view))
+        templateBox, err := rice.FindBox("../views/")
+        if err != nil {
+            log.Fatal(err)
+        }
+        // get file contents as string
+        templateString, err := templateBox.String(view)
+        if err != nil {
+            log.Fatal(err)
+        }
+        //tpl := template.Must(template.Parse(templateString))
+        tpl, err := template.New("tpl").Parse(templateString)
+        if err != nil {
+                http.Error(w, "500 Internal Error : Error while generating directory listing.", 500)
+                fmt.Println(err)
+                return err
+        }
 
-        err := tpl.Execute(w,data)
+        err = tpl.Execute(w,data)
         if err != nil {
                 return err
         }

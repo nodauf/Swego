@@ -4,16 +4,20 @@ build:
 run:
 	go run webserver.go
 
-compile:
+assets:
+	$(GOGET) go get github.com/GeertJohan/go.rice
+	$(GOPATH)/bin/rice embed-go -i ./controllers
+
+compile: assets
 	# 32-Bit Systems
 	# Linux
-	CGO_ENABLED=0 GOOS=linux GOARCH=386 go build -o bin/main-linux-386 main.go
+	CGO_ENABLED=0 GOOS=linux GOARCH=386 go build -o bin/webserver-linux-386 webserver.go
 	# Windows
-	CGO_ENABLED=0 GOOS=windows GOARCH=386 go build -o bin/main-windows-386 main.go
+	CGO_ENABLED=0 GOOS=windows GOARCH=386 go build -o bin/webserver-windows-386 webserver.go
     
 	# 64-Bit
 	# Linux
-	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o bin/main-linux-amd64 main.go
+	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o bin/webserver-linux-amd64 webserver.go
 	# Windows
-	CGO_ENABLED=0 GOOS=windows GOARCH=amd64 go build -o bin/main-windows-amd64 main.go
+	CGO_ENABLED=0 GOOS=windows GOARCH=amd64 go build -o bin/webserver-windows-amd64 webserver.go
 
