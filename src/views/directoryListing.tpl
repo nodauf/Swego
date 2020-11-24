@@ -7,6 +7,8 @@
          a, a:active {text-decoration: none; color: blue;}
          a:visited {color: #48468F;}
          a:hover, a:focus {text-decoration: underline; color: red;}
+         td.directory a, a:active {text-decoration: none; color: #1FBC33;}
+         td.directory a:visited {color: #1FBC33;}
          body {background-color: #F5F5F5;}
          h2 {margin-bottom: 12px;}
          table {margin-left: 12px;}
@@ -40,13 +42,13 @@
                </tr>
                {{range .Children_dir}}
                <tr>
-                  <td class="n"><a href="{{.}}/">{{.}}/</a></td>
+                  <td class="n directory"><a href="{{.}}/">{{.}}/</a></td>
                   <td class="t">Directory</td>
-                  <td class="dl"></td>
+                  <td class="dl directory"><a href="{{.}}?dl">Download</a> | <a href="{{.}}?dlenc">encrypted zip (pwd: infected)</a></td>
                </tr>
                {{end}}
                {{range .Children_files}}
-               <tr>
+               <tr class="file">
                   <td class="n"><a href="{{.}}">{{.}}</a></td>
                   <td class="t">&nbsp;</td>
                   <td class="dl"><a href="{{.}}?dl">Download</a> | <a href="{{.}}?dlenc">encrypted zip (pwd: infected)</a></td>
