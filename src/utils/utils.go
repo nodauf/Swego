@@ -94,7 +94,7 @@ func ParseRange(data string) int64 {
         return stop
 }
 
-func Encryptfile(f *os.File, password string) string{
+func AddfiletoEncryptedZip(f *os.File, zipFile *os.File, password string) string{
     fileInfo,_ :=f.Stat()
     fileName := fileInfo.Name()
     filePathName := f.Name()
@@ -102,11 +102,11 @@ func Encryptfile(f *os.File, password string) string{
     if err != nil {
         log.Fatalf("unable to read file: %v", err)
     }
-    fzip, err := os.Create(filePathName+".zip")
+
     if err != nil {
         log.Fatalln(err)
     }
-    zipw := zip.NewWriter(fzip)
+    zipw := zip.NewWriter(zipFile)
     defer zipw.Close()
     w, err := zipw.Encrypt(fileName, password, zip.StandardEncryption)
     if err != nil {
@@ -119,6 +119,7 @@ func Encryptfile(f *os.File, password string) string{
     zipw.Flush()
 	return filePathName+".zip"
 }
+
 // fileExists checks if a file exists and is not a directory before we
 // try using it to prevent further errors.
 func FileExists(filename string) bool {

@@ -72,11 +72,18 @@ func serveFile(filepath string, w http.ResponseWriter, req *http.Request) {
         if err == nil && len(query["dl"]) > 0 { // The user explicitedly wanted to download the file (Dropbox style!)
                 w.Header().Set("Content-Type", "application/octet-stream")
         }else if err == nil && len(query["dlenc"]) > 0{
-                w.Header().Set("Content-Type", "application/octet-stream")
-                filepathenc := utils.Encryptfile(f,"infected")
+
+                filePathName := f.Name()
+                zipFile, err := os.Create(filePathName+".zip")
+                if err != nil {
+                    log.Fatalln(err)
+                }
+                filepathenc := utils.AddfiletoEncryptedZip(f, zipFile, "infected")
+
                 // Generate the request for the new file
                 newFile := strings.Split(req.URL.String(),"?")
                 newRequest, _ := http.NewRequest("GET", "http://"+req.Host+newFile[0], nil)
+
                 // Serve the new file (encrypted zip)
                 serveFile(filepathenc ,w , newRequest)
                 os.Remove(filepathenc)
