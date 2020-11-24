@@ -6,9 +6,9 @@
 * Define a private folder with basic authentication
 * Upload file
 * Download file as an encrypted zip (password: infected)
+* HTTPS
 
 ## Todo
 
-* HTTPS
 * Hardcoded reverse shell
 * Download folder with a zip
