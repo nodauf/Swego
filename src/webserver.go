@@ -21,7 +21,7 @@ func main() {
             http.Handle("/"+*controllers.Private+"/", routers.Use(routers.Router,controllers.BasicAuth))
             fmt.Printf("Sharing %s/%s on %s ...\n", *controllers.Root_folder, *controllers.Private, *controllers.Bind)
         }
-        http.ListenAndServe((*controllers.Bind), nil)
+        http.ListenAndServe(":"+(*controllers.Bind), nil)
 }
 
 

@@ -23,7 +23,7 @@ func ParseArgs(){
         }
 
         // Command line parsing
-        Bind = flag.String("bind", ":1718", "Bind address")
+        Bind = flag.String("bind", "8080", "Bind Port")
         Root_folder = flag.String("root", cwd, "Root folder")
         Public = flag.String("public", "", "Default " + cwd + " public folder")
         Private = flag.String("private", "private", "Private folder with basic auth, default " + cwd + "/private")
