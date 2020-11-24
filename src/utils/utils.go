@@ -119,3 +119,12 @@ func Encryptfile(f *os.File, password string) string{
     zipw.Flush()
 	return filePathName+".zip"
 }
+// fileExists checks if a file exists and is not a directory before we
+// try using it to prevent further errors.
+func FileExists(filename string) bool {
+    info, err := os.Stat(filename)
+    if os.IsNotExist(err) {
+        return false
+    }
+    return !info.IsDir()
+}

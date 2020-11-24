@@ -5,12 +5,14 @@ uses lighttpd's directory listing HTML template. */
 
 package main
 
-import "net/http"
-import "fmt"
-//import "SimpleHTTPServer-golang/src/utils"
-import "SimpleHTTPServer-golang/src/routers"
-import "SimpleHTTPServer-golang/src/controllers"
+import (
+    "net/http"
+    "fmt"
+    "log"
 
+    "SimpleHTTPServer-golang/src/routers"
+    "SimpleHTTPServer-golang/src/controllers"
+)
 
 func main() {
         controllers.ParseArgs()
@@ -21,7 +23,15 @@ func main() {
             http.Handle("/"+*controllers.Private+"/", routers.Use(routers.Router,controllers.BasicAuth))
             fmt.Printf("Sharing %s/%s on %s ...\n", *controllers.Root_folder, *controllers.Private, *controllers.Bind)
         }
-        http.ListenAndServe(":"+(*controllers.Bind), nil)
+        var err error
+        if *controllers.Tls {
+            err = http.ListenAndServeTLS(":"+(*controllers.Bind), *controllers.Certificate, *controllers.Key,nil)
+        }else{
+            err = http.ListenAndServe(":"+(*controllers.Bind), nil)
+        }
+        if err != nil {
+            log.Fatal("ListenAndServe: ", err)
+        }
 }
 
 
