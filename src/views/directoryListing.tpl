@@ -7,8 +7,9 @@
          a, a:active {text-decoration: none; color: blue;}
          a:visited {color: #48468F;}
          a:hover, a:focus {text-decoration: underline; color: red;}
-         td.directory a, a:active {text-decoration: none; color: #1FBC33;}
+         td.directory a, td.directory a:active {text-decoration: none; color: #1FBC33;}
          td.directory a:visited {color: #1FBC33;}
+         td.directory a:hover,td.directory a:focus {text-decoration: underline; color: red;}
          body {background-color: #F5F5F5;}
          h2 {margin-bottom: 12px;}
          table {margin-left: 12px;}
