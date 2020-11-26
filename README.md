@@ -7,8 +7,8 @@
 * Upload file
 * Download file as an encrypted zip (password: infected)
 * HTTPS
+* Download folder with a zip
 
 ## Todo
 
 * Hardcoded reverse shell
-* Download folder with a zip
