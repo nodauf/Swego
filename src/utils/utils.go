@@ -4,6 +4,7 @@ import(
 	"strings"
 	"container/list"
 	"io/ioutil"
+    "path/filepath"
 	"os"
 	"log"
 	"bytes"
@@ -94,31 +95,38 @@ func ParseRange(data string) int64 {
         return stop
 }
 
-func Encryptfile(f *os.File, password string) string{
-    fileInfo,_ :=f.Stat()
-    fileName := fileInfo.Name()
-    filePathName := f.Name()
-    body, err := ioutil.ReadFile(filePathName)
-    if err != nil {
-        log.Fatalf("unable to read file: %v", err)
-    }
-    fzip, err := os.Create(filePathName+".zip")
-    if err != nil {
-        log.Fatalln(err)
-    }
-    zipw := zip.NewWriter(fzip)
-    defer zipw.Close()
-    w, err := zipw.Encrypt(fileName, password, zip.StandardEncryption)
-    if err != nil {
-        log.Fatal(err)
-    }
-    _, err = io.Copy(w, bytes.NewReader(body))
-    if err != nil {
-        log.Fatal(err)
-    }
-    zipw.Flush()
-	return filePathName+".zip"
+//func AddfiletoEncryptedZip(path string, f *os.File, zipw *zip.Writer, password string) {
+func AddfiletoZip(path string, f *os.File, zipw *zip.Writer, encrypted bool, password string) {
+        filePathName := f.Name()
+
+        body, err := ioutil.ReadFile(filePathName)
+        if err != nil {
+            log.Fatalf("unable to read file: %v", err)
+        }
+
+        if err != nil {
+            log.Fatalln(err)
+        }
+
+        //Create the file to the zip zipw
+        var w io.Writer
+        if encrypted {
+            w, err = zipw.Encrypt(path, password, zip.StandardEncryption)
+        }else{
+            w, err = zipw.Create(path)
+        }
+        if err != nil {
+            log.Fatal(err)
+        }
+        // Copy the data of the local file f into the zip
+        _, err = io.Copy(w, bytes.NewReader(body))
+        if err != nil {
+            log.Fatal(err)
+        }
+        zipw.Flush()
+        return
 }
+
 // fileExists checks if a file exists and is not a directory before we
 // try using it to prevent further errors.
 func FileExists(filename string) bool {
@@ -127,4 +135,51 @@ func FileExists(filename string) bool {
         return false
     }
     return !info.IsDir()
+}
+
+func ZipDirectory(f *os.File, encrypted bool) string{
+	// Absolute path to the directory
+	directoryPathName := f.Name()
+    statinfo, _ := f.Stat()
+
+	// Name of the diretory to download
+	directoryName := statinfo.Name()
+
+	// Create the zip file
+	zipFile, err := os.Create(directoryPathName+"/"+directoryName+".zip")
+	if err != nil {
+		log.Fatalln("os.Create: "+err.Error())
+	}
+	zipFilePath := zipFile.Name()
+	zipw := zip.NewWriter(zipFile)
+
+	// Iterate recursively in the folder folderPathName
+	err = filepath.Walk(directoryPathName,
+		func(path string, info os.FileInfo, err error) error {
+			// Take the relative path from the root directory of the web server
+			zipPath := directoryName + strings.SplitAfter(path,directoryPathName)[1]
+
+			if err != nil {
+				return err
+			}
+
+			// Don't add folder and the zip itself
+			if(!info.IsDir() && info.Name() != directoryName+".zip"){
+				// Open the file to zip
+				f, err = os.Open(path)
+
+				if err != nil {
+						return err
+				}
+
+				AddfiletoZip(zipPath, f, zipw, encrypted, "infected")
+			}
+			return nil
+		})
+	zipw.Close()
+	if err != nil {
+		log.Println("walk directory zip: "+err.Error())
+	}
+
+    return zipFilePath
 }

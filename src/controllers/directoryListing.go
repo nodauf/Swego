@@ -17,8 +17,10 @@ import (
     "html/template"
     "strings"
     "log"
+    "sort"
 
     "github.com/GeertJohan/go.rice"
+    "github.com/yeka/zip"
 )
 
 const serverUA = ""
@@ -32,9 +34,9 @@ func HandleFile(w http.ResponseWriter, req *http.Request) {
 
 }
 
-func serveFile(filepath string, w http.ResponseWriter, req *http.Request) {
+func serveFile(filePath string, w http.ResponseWriter, req *http.Request) {
         // Opening the file handle
-        f, err := os.Open(filepath)
+        f, err := os.Open(filePath)
         if err != nil {
                 http.Error(w, "404 Not Found : Error while opening the file.", 404)
                 return
@@ -49,8 +51,41 @@ func serveFile(filepath string, w http.ResponseWriter, req *http.Request) {
                 return
         }
 
+        // Content-Type handling
+        query, err := url.ParseQuery(req.URL.RawQuery)
+
         if statinfo.IsDir() { // If it's a directory, open it !
-                handleDirectory(f, w, req)
+                if err == nil && len(query["dl"]) > 0 {
+                    zipFilePath := utils.ZipDirectory(f, false)
+
+                    // Generate the request for the new file - remove ?dl to download the file
+                    newFile := strings.Split(req.URL.String(),"?")
+                    newRequest, _ := http.NewRequest("GET", "http://"+req.Host+newFile[0], nil)
+
+                    // Serve the new file (encrypted zip)
+                    serveFile(zipFilePath, w, newRequest)
+
+                    // Remove the zip file
+                    os.Remove(zipFilePath)
+
+                    return
+
+                }else if err == nil && len(query["dlenc"]) > 0{
+                    zipFilePath := utils.ZipDirectory(f, true)
+                    // Generate the request for the new file - remove ?dl to download the file
+
+                    newFile := strings.Split(req.URL.String(),"?")
+                    newRequest, _ := http.NewRequest("GET", "http://"+req.Host+newFile[0], nil)
+
+                    // Serve the new file (encrypted zip)
+                    serveFile(zipFilePath, w, newRequest)
+
+                    // Remove the zip file
+                    os.Remove(zipFilePath)
+                    return
+                }else{
+                    handleDirectory(f, w, req)
+                }
                 return
         }
 
@@ -66,24 +101,37 @@ func serveFile(filepath string, w http.ResponseWriter, req *http.Request) {
         }
         w.Header().Set("Last-Modified", statinfo.ModTime().Format(http.TimeFormat))
 
-        // Content-Type handling
-        query, err := url.ParseQuery(req.URL.RawQuery)
-
         if err == nil && len(query["dl"]) > 0 { // The user explicitedly wanted to download the file (Dropbox style!)
                 w.Header().Set("Content-Type", "application/octet-stream")
         }else if err == nil && len(query["dlenc"]) > 0{
-                w.Header().Set("Content-Type", "application/octet-stream")
-                filepathenc := utils.Encryptfile(f,"infected")
+
+                // Absolute path to the file
+                filePathName := f.Name()
+                // Create the zip file
+                zipFile, err := os.Create(filePathName+".zip")
+                if err != nil {
+                    log.Fatalln(err)
+                }
+                zipFilePath := zipFile.Name()
+                zipw := zip.NewWriter(zipFile)
+
+                // Add file f to the zip 
+                utils.AddfiletoZip(statinfo.Name(),f, zipw, true, "infected")
+
+                // Manually close the zip
+                zipw.Close()
+
                 // Generate the request for the new file
                 newFile := strings.Split(req.URL.String(),"?")
                 newRequest, _ := http.NewRequest("GET", "http://"+req.Host+newFile[0], nil)
+
                 // Serve the new file (encrypted zip)
-                serveFile(filepathenc ,w , newRequest)
-                os.Remove(filepathenc)
+                serveFile(zipFilePath ,w , newRequest)
+                os.Remove(zipFilePath)
                 return
         } else {
                 // Fetching file's mimetype and giving it to the browser
-                if mimetype := mime.TypeByExtension(path.Ext(filepath)); mimetype != "" {
+                if mimetype := mime.TypeByExtension(path.Ext(filePath)); mimetype != "" {
                         w.Header().Set("Content-Type", mimetype)
                 } else {
                         w.Header().Set("Content-Type", "application/octet-stream")
@@ -185,6 +233,11 @@ func handleDirectory(f *os.File, w http.ResponseWriter, req *http.Request) {
         // And transfer the content to the final array structure
         children_dir := utils.CopyToArray(children_dir_tmp)
         children_files := utils.CopyToArray(children_files_tmp)
+        //Sort children_dir and children_files
+        sort.Slice(children_dir, func(i, j int) bool { return children_dir[i] < children_dir[j] })
+
+        //Sort children_dir and children_files
+        sort.Slice(children_files, func(i, j int) bool { return children_files[i] < children_files[j] })
 
         data := utils.Dirlisting{Name: req.URL.Path, ServerUA: serverUA,
                 Children_dir: children_dir, Children_files: children_files}
