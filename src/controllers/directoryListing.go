@@ -17,7 +17,6 @@ import (
     "html/template"
     "strings"
     "log"
-    "path/filepath"
     "sort"
 
     "github.com/GeertJohan/go.rice"
@@ -57,56 +56,31 @@ func serveFile(filePath string, w http.ResponseWriter, req *http.Request) {
 
         if statinfo.IsDir() { // If it's a directory, open it !
                 if err == nil && len(query["dl"]) > 0 {
-                    return
+                    zipFilePath := utils.ZipDirectory(f, false)
 
-                }else if err == nil && len(query["dlenc"]) > 0{
-                    // Absolute path to the directory
-                    folderPathName := f.Name()
-
-                    // Name of the diretory to download
-                    folderName := statinfo.Name()
-
-                    // Create the zip file
-                    zipFile, err := os.Create(folderPathName+"/"+folderName+".zip")
-                    if err != nil {
-                        log.Fatalln("os.Create: "+err.Error())
-                    }
-                    zipFilePath := zipFile.Name()
-                    zipw := zip.NewWriter(zipFile)
-
-                    // Iterate recursively in the folder folderPathName
-                    err = filepath.Walk(folderPathName,
-                        func(path string, info os.FileInfo, err error) error {
-                            // Take the relative path from the root directory of the web server
-                            zipPath := folderName + strings.SplitAfter(path,folderPathName)[1]
-
-                            if err != nil {
-                                return err
-                            }
-
-                            // Don't add folder and the zip itself
-                            if(!info.IsDir() && info.Name() != folderName+".zip"){
-                                // Open the file to zip
-                                f, err = os.Open(path)
-
-                                if err != nil {
-                                        return err
-                                }
-                                utils.AddfiletoEncryptedZip(zipPath, f, zipw, "infected")
-                            }
-                            return nil
-                        })
-                    zipw.Close()
-                    if err != nil {
-                        log.Println("walk directory zip: "+err.Error())
-                    }
                     // Generate the request for the new file - remove ?dl to download the file
                     newFile := strings.Split(req.URL.String(),"?")
                     newRequest, _ := http.NewRequest("GET", "http://"+req.Host+newFile[0], nil)
 
                     // Serve the new file (encrypted zip)
-                    serveFile(zipFilePath, w , newRequest)
-                    //Remove the zip file
+                    serveFile(zipFilePath, w, newRequest)
+
+                    // Remove the zip file
+                    os.Remove(zipFilePath)
+
+                    return
+
+                }else if err == nil && len(query["dlenc"]) > 0{
+                    zipFilePath := utils.ZipDirectory(f, true)
+                    // Generate the request for the new file - remove ?dl to download the file
+
+                    newFile := strings.Split(req.URL.String(),"?")
+                    newRequest, _ := http.NewRequest("GET", "http://"+req.Host+newFile[0], nil)
+
+                    // Serve the new file (encrypted zip)
+                    serveFile(zipFilePath, w, newRequest)
+
+                    // Remove the zip file
                     os.Remove(zipFilePath)
                     return
                 }else{
@@ -131,7 +105,7 @@ func serveFile(filePath string, w http.ResponseWriter, req *http.Request) {
                 w.Header().Set("Content-Type", "application/octet-stream")
         }else if err == nil && len(query["dlenc"]) > 0{
 
-                // Absolute path to the directory
+                // Absolute path to the file
                 filePathName := f.Name()
                 // Create the zip file
                 zipFile, err := os.Create(filePathName+".zip")
@@ -142,7 +116,7 @@ func serveFile(filePath string, w http.ResponseWriter, req *http.Request) {
                 zipw := zip.NewWriter(zipFile)
 
                 // Add file f to the zip 
-                utils.AddfiletoEncryptedZip(statinfo.Name(),f, zipw, "infected")
+                utils.AddfiletoZip(statinfo.Name(),f, zipw, true, "infected")
 
                 // Manually close the zip
                 zipw.Close()

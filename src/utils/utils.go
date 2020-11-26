@@ -4,6 +4,7 @@ import(
 	"strings"
 	"container/list"
 	"io/ioutil"
+    "path/filepath"
 	"os"
 	"log"
 	"bytes"
@@ -94,8 +95,8 @@ func ParseRange(data string) int64 {
         return stop
 }
 
-//func AddfiletoEncryptedZip(f *os.File, zipw *zip.Writer, password string) {
-func AddfiletoEncryptedZip(path string, f *os.File, zipw *zip.Writer, password string) {
+//func AddfiletoEncryptedZip(path string, f *os.File, zipw *zip.Writer, password string) {
+func AddfiletoZip(path string, f *os.File, zipw *zip.Writer, encrypted bool, password string) {
         filePathName := f.Name()
 
         body, err := ioutil.ReadFile(filePathName)
@@ -108,7 +109,12 @@ func AddfiletoEncryptedZip(path string, f *os.File, zipw *zip.Writer, password s
         }
 
         //Create the file to the zip zipw
-        w, err := zipw.Encrypt(path, password, zip.StandardEncryption)
+        var w io.Writer
+        if encrypted {
+            w, err = zipw.Encrypt(path, password, zip.StandardEncryption)
+        }else{
+            w, err = zipw.Create(path)
+        }
         if err != nil {
             log.Fatal(err)
         }
@@ -129,4 +135,51 @@ func FileExists(filename string) bool {
         return false
     }
     return !info.IsDir()
+}
+
+func ZipDirectory(f *os.File, encrypted bool) string{
+	// Absolute path to the directory
+	directoryPathName := f.Name()
+    statinfo, _ := f.Stat()
+
+	// Name of the diretory to download
+	directoryName := statinfo.Name()
+
+	// Create the zip file
+	zipFile, err := os.Create(directoryPathName+"/"+directoryName+".zip")
+	if err != nil {
+		log.Fatalln("os.Create: "+err.Error())
+	}
+	zipFilePath := zipFile.Name()
+	zipw := zip.NewWriter(zipFile)
+
+	// Iterate recursively in the folder folderPathName
+	err = filepath.Walk(directoryPathName,
+		func(path string, info os.FileInfo, err error) error {
+			// Take the relative path from the root directory of the web server
+			zipPath := directoryName + strings.SplitAfter(path,directoryPathName)[1]
+
+			if err != nil {
+				return err
+			}
+
+			// Don't add folder and the zip itself
+			if(!info.IsDir() && info.Name() != directoryName+".zip"){
+				// Open the file to zip
+				f, err = os.Open(path)
+
+				if err != nil {
+						return err
+				}
+
+				AddfiletoZip(zipPath, f, zipw, encrypted, "infected")
+			}
+			return nil
+		})
+	zipw.Close()
+	if err != nil {
+		log.Println("walk directory zip: "+err.Error())
+	}
+
+    return zipFilePath
 }
