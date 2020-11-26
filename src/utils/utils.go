@@ -94,30 +94,31 @@ func ParseRange(data string) int64 {
         return stop
 }
 
-func AddfiletoEncryptedZip(f *os.File, zipFile *os.File, password string) string{
-    fileInfo,_ :=f.Stat()
-    fileName := fileInfo.Name()
-    filePathName := f.Name()
-    body, err := ioutil.ReadFile(filePathName)
-    if err != nil {
-        log.Fatalf("unable to read file: %v", err)
-    }
+//func AddfiletoEncryptedZip(f *os.File, zipw *zip.Writer, password string) {
+func AddfiletoEncryptedZip(path string, f *os.File, zipw *zip.Writer, password string) {
+        filePathName := f.Name()
 
-    if err != nil {
-        log.Fatalln(err)
-    }
-    zipw := zip.NewWriter(zipFile)
-    defer zipw.Close()
-    w, err := zipw.Encrypt(fileName, password, zip.StandardEncryption)
-    if err != nil {
-        log.Fatal(err)
-    }
-    _, err = io.Copy(w, bytes.NewReader(body))
-    if err != nil {
-        log.Fatal(err)
-    }
-    zipw.Flush()
-	return filePathName+".zip"
+        body, err := ioutil.ReadFile(filePathName)
+        if err != nil {
+            log.Fatalf("unable to read file: %v", err)
+        }
+
+        if err != nil {
+            log.Fatalln(err)
+        }
+
+        //Create the file to the zip zipw
+        w, err := zipw.Encrypt(path, password, zip.StandardEncryption)
+        if err != nil {
+            log.Fatal(err)
+        }
+        // Copy the data of the local file f into the zip
+        _, err = io.Copy(w, bytes.NewReader(body))
+        if err != nil {
+            log.Fatal(err)
+        }
+        zipw.Flush()
+        return
 }
 
 // fileExists checks if a file exists and is not a directory before we
