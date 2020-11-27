@@ -12,3 +12,4 @@
 ## Todo
 
 * Hardcoded reverse shell
+* Ability to execute embedded binary
