@@ -23,6 +23,7 @@
    </head>
    <body>
       <h2>Index of {{.Name}}</h2>
+      <a href="/?embedded" style="font-size:small;">→ Embedded files</a>
       <hr />
       <form enctype="multipart/form-data" method="post"><input type="file" name="file"/><input type="submit" value="upload"/></form>
       <hr />
@@ -48,11 +49,18 @@
                   <td class="dl directory"><a href="{{.}}?dl">Download</a> | <a href="{{.}}?dlenc">encrypted zip (pwd: infected)</a></td>
                </tr>
                {{end}}
+                  {{  .Embedded }}
                {{range .Children_files}}
                <tr class="file">
-                  <td class="n"><a href="{{.}}">{{.}}</a></td>
-                  <td class="t">&nbsp;</td>
-                  <td class="dl"><a href="{{.}}?dl">Download</a> | <a href="{{.}}?dlenc">encrypted zip (pwd: infected)</a></td>
+                  {{ if $.Embedded }}
+                    <td class="n"><a href="{{.}}?embedded">{{.}}</a></td>
+                    <td class="t">&nbsp;</td>
+                    <td class="dl"><a href="{{.}}?embedded&dl">Download</a> | <a href="{{.}}?embedded&dlenc">encrypted zip (pwd: infected)</a></td>
+                  {{ else }}
+                    <td class="n"><a href="{{.}}">{{.}}</a></td>
+                    <td class="t">&nbsp;</td>
+                    <td class="dl"><a href="{{.}}?dl">Download</a> | <a href="{{.}}?dlenc">encrypted zip (pwd: infected)</a></td>
+                  {{ end }}
                </tr>
                {{end}}
             </tbody>

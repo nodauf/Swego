@@ -10,8 +10,11 @@ import(
 	"bytes"
 	"io"
 
+    "github.com/GeertJohan/go.rice"
 	"github.com/yeka/zip"
 )
+
+const fs_maxbufsize = 4096
 
 type Params struct {
 	Name string
@@ -26,6 +29,7 @@ type Dirlisting struct {
         Children_dir   []string
         Children_files []string
         ServerUA       string
+        Embedded       bool
 }
 
 func TrimSuffix(s, suffix string) string {
@@ -104,9 +108,44 @@ func AddfiletoZip(path string, f *os.File, zipw *zip.Writer, encrypted bool, pas
             log.Fatalf("unable to read file: %v", err)
         }
 
-        if err != nil {
-            log.Fatalln(err)
+        //Create the file to the zip zipw
+        var w io.Writer
+        if encrypted {
+            w, err = zipw.Encrypt(path, password, zip.StandardEncryption)
+        }else{
+            w, err = zipw.Create(path)
         }
+        if err != nil {
+            log.Fatal(err)
+        }
+        // Copy the data of the local file f into the zip
+        _, err = io.Copy(w, bytes.NewReader(body))
+        if err != nil {
+            log.Fatal(err)
+        }
+        zipw.Flush()
+        return
+}
+
+func AddRicefiletoZip(path string, f *rice.File, filePathName string, zipw *zip.Writer, encrypted bool, password string) {
+//        body, err := ioutil.ReadFile(filePathName)
+        statInfo, err := f.Stat()
+        if err != nil {
+            log.Println("500 Internal Error : stat() failure for the file: " + filePathName)
+            return
+        }
+        buf := make([]byte, statInfo.Size())
+		var body []byte
+//		n := 0
+        for err == nil {
+                _, err = f.Read(buf)
+				body = append(body, buf ...)
+                //output_writer.Write(body[0:n])
+        }
+
+//        if err != nil {
+//            log.Fatalf("unable to read file: %v", err)
+//        }
 
         //Create the file to the zip zipw
         var w io.Writer

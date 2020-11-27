@@ -1,0 +1,222 @@
+package controllers
+
+import (
+    "net/http"
+    "os"
+    "fmt"
+    "sort"
+    "container/list"
+    "path"
+    "strings"
+	"mime"
+	"log"
+	"net/url"
+	"io"
+	"strconv"
+	"compress/gzip"
+	"compress/zlib"
+
+	"github.com/GeertJohan/go.rice"
+	"github.com/yeka/zip"
+
+    "SimpleHTTPServer-golang/src/utils"
+)
+
+const pathEmbedded = "./assets/embedded/"
+
+func embeddedRequest(w http.ResponseWriter, req *http.Request) {
+    requestPath := strings.Split(req.RequestURI,"?")[0]
+
+	if requestPath[len(requestPath)-1:] == "/" { // Directory listing if it's a folder (last character is /)
+        handleEmbeddedDirectory(requestPath, w, req)
+    }else{ // It's a file, we serve the file
+		fileName := requestPath[1:]
+        serveEmbeddedFile(fileName, w, req)
+    }
+}
+
+func serveEmbeddedFile(filePath string, w http.ResponseWriter, req *http.Request) {
+		//Can't use variable, otherwise rice generate an error when rice embed-go ....
+        templateBox, err := rice.FindBox("../assets/embedded/")
+
+		if err != nil {
+            log.Fatal(err)
+        }
+        // Opening the file handle
+        //f, err := os.Open(filePath)
+		f, err := templateBox.Open(filePath)
+
+
+        // Content-Type handling
+        query, errParseQuery := url.ParseQuery(req.URL.RawQuery)
+
+        if err != nil {
+                http.Error(w, "404 Not Found : Error while opening the file.", 404)
+                log.Println("404 Not Found : Error while opening the file "+ filePath)
+                return
+        }
+        defer f.Close()
+
+        // Checking if the opened handle is really a file
+        statinfo, err := f.Stat()
+        if err != nil || errParseQuery != nil {
+                http.Error(w, "500 Internal Error : stat() failure.", 500)
+                log.Println("500 Internal Error : stat() failure for the file: " + filePath)
+                return
+        }
+        if errParseQuery == nil && len(query["dl"]) > 0 { // The user explicitedly wanted to download the file (Dropbox style!)
+                w.Header().Set("Content-Type", "application/octet-stream")
+        }else if errParseQuery == nil && len(query["dlenc"]) > 0{ // Download the file as an encrypted zip
+
+                // Absolute path to the file
+                //filePathName := f.Name()
+                // Create the zip file can't create in embedded path. Create temporarily in root of the webserver 
+                zipFile, err := os.Create(filePath+".zip")
+                if err != nil {
+                    log.Fatalln(err)
+                }
+                zipFilePath := zipFile.Name()
+                zipw := zip.NewWriter(zipFile)
+
+                // Add file f to the zip
+                utils.AddRicefiletoZip(statinfo.Name(), f, filePath, zipw, true, "infected")
+
+                // Manually close the zip
+                zipw.Close()
+
+                // Generate the request for the new file
+                newFile := strings.Split(req.URL.String(),"?")
+				fmt.Println(zipFilePath)
+                newRequest, _ := http.NewRequest("GET", "http://"+req.Host+newFile[0], nil)
+
+                // Serve the new file (encrypted zip)
+                serveFile(zipFilePath ,w , newRequest)
+                os.Remove(zipFilePath)
+                return
+        } else {
+                // Fetching file's mimetype and giving it to the browser
+                if mimetype := mime.TypeByExtension(path.Ext(filePath)); mimetype != "" {
+                        w.Header().Set("Content-Type", mimetype)
+                } else {
+                        w.Header().Set("Content-Type", "application/octet-stream")
+                }
+        }
+
+        // Manage gzip/zlib compression
+        output_writer := w.(io.Writer)
+
+        is_compressed_reply := false
+
+        if (*Uses_gzip) == true && req.Header.Get("Accept-Encoding") != "" {
+                encodings := utils.ParseCSV(req.Header.Get("Accept-Encoding"))
+
+                for _, val := range encodings {
+                        if val == "gzip" {
+                                w.Header().Set("Content-Encoding", "gzip")
+                                output_writer = gzip.NewWriter(w)
+
+                                is_compressed_reply = true
+
+                                break
+                        } else if val == "deflate" {
+                                w.Header().Set("Content-Encoding", "deflate")
+                                output_writer = zlib.NewWriter(w)
+
+                                is_compressed_reply = true
+
+                                break
+                        }
+                }
+        }
+
+        if !is_compressed_reply {
+                // Add Content-Length
+                w.Header().Set("Content-Length", strconv.FormatInt(statinfo.Size(), 10))
+        }
+
+        // Stream data out !
+        buf := make([]byte, utils.Min(fs_maxbufsize, statinfo.Size()))
+        n := 0
+        for err == nil {
+                n, err = f.Read(buf)
+                output_writer.Write(buf[0:n])
+        }
+        // Closes current compressors
+        switch output_writer.(type) {
+        case *gzip.Writer:
+                output_writer.(*gzip.Writer).Close()
+        case *zlib.Writer:
+                output_writer.(*zlib.Writer).Close()
+        }
+        //f.Close()
+}
+
+func handleEmbeddedDirectory(path string, w http.ResponseWriter, req *http.Request) {
+		//Can't use variable, otherwise rice generate an error when rice embed-go ....
+        templateBox, err := rice.FindBox("../assets/embedded/")
+		if err != nil {
+            log.Fatal(err)
+        }
+	    // Otherwise, generate folder content.
+		children_dir_tmp := list.New()
+		children_files_tmp := list.New()
+        err = templateBox.Walk("/", func(path string, info os.FileInfo, err error) error {
+			//fmt.Println(path)
+			if info.IsDir() {
+				children_dir_tmp.PushBack(info.Name())
+			}else{
+				children_files_tmp.PushBack(info.Name())
+			}
+			return nil
+        })
+		if err != nil {
+            log.Fatal(err)
+        }
+
+
+//        names, _ := f.Readdir(-1)
+//
+//        // First, check if there is any index in this folder.
+//        for _, val := range names {
+//                if val.Name() == "index.html" {
+//                        serveFile(path.Join(f.Name(), "index.html"), w, req)
+//                        return
+//                }
+//        }
+//
+//        // Otherwise, generate folder content.
+//        children_dir_tmp := list.New()
+//        children_files_tmp := list.New()
+//
+//        for _, val := range names {
+//                if val.Name()[0] == '.' {
+//                        continue
+//                } // Remove hidden files from listing
+//
+//                if val.IsDir() {
+//                        // There is an issue. There shoudln't be a folder here
+//                        children_dir_tmp.PushBack(val.Name())
+//                } else {
+//                        children_files_tmp.PushBack(val.Name())
+//                }
+//        }
+//
+        // And transfer the content to the final array structure
+        children_dir := utils.CopyToArray(children_dir_tmp)
+        children_files := utils.CopyToArray(children_files_tmp)
+        //Sort children_dir and children_files
+        sort.Slice(children_dir, func(i, j int) bool { return children_dir[i] < children_dir[j] })
+
+        //Sort children_dir and children_files
+        sort.Slice(children_files, func(i, j int) bool { return children_files[i] < children_files[j] })
+
+        data := utils.Dirlisting{Name: req.URL.Path,
+								 ServerUA: serverUA,
+								 Children_dir: children_dir,
+								 Children_files: children_files,
+								 Embedded: true}
+	    err = renderTemplate(w,"directoryListing.tpl",data)
+	    if err != nil {
+		    fmt.Println(err)
+	}
+}
