@@ -37,8 +37,18 @@ func HandleFile(w http.ResponseWriter, req *http.Request) {
 func serveFile(filePath string, w http.ResponseWriter, req *http.Request) {
         // Opening the file handle
         f, err := os.Open(filePath)
+
+        // Content-Type handling
+        query, errParseQuery := url.ParseQuery(req.URL.RawQuery)
+
+        if errParseQuery == nil && len(query["embedded"]) > 0{ // Manage embedded files
+            embeddedRequest(w, req)
+            return
+        }
+
         if err != nil {
                 http.Error(w, "404 Not Found : Error while opening the file.", 404)
+                log.Println("404 Not Found : Error while opening the file "+ filePath)
                 return
         }
 
@@ -46,16 +56,14 @@ func serveFile(filePath string, w http.ResponseWriter, req *http.Request) {
 
         // Checking if the opened handle is really a file
         statinfo, err := f.Stat()
-        if err != nil {
+        if err != nil || errParseQuery != nil {
                 http.Error(w, "500 Internal Error : stat() failure.", 500)
+                log.Println("500 Internal Error : stat() failure for the file: " + filePath)
                 return
         }
 
-        // Content-Type handling
-        query, err := url.ParseQuery(req.URL.RawQuery)
-
         if statinfo.IsDir() { // If it's a directory, open it !
-                if err == nil && len(query["dl"]) > 0 {
+                if errParseQuery == nil && len(query["dl"]) > 0 {
                     zipFilePath := utils.ZipDirectory(f, false)
 
                     // Generate the request for the new file - remove ?dl to download the file
@@ -70,7 +78,7 @@ func serveFile(filePath string, w http.ResponseWriter, req *http.Request) {
 
                     return
 
-                }else if err == nil && len(query["dlenc"]) > 0{
+                }else if errParseQuery == nil && len(query["dlenc"]) > 0{
                     zipFilePath := utils.ZipDirectory(f, true)
                     // Generate the request for the new file - remove ?dl to download the file
 
@@ -101,9 +109,9 @@ func serveFile(filePath string, w http.ResponseWriter, req *http.Request) {
         }
         w.Header().Set("Last-Modified", statinfo.ModTime().Format(http.TimeFormat))
 
-        if err == nil && len(query["dl"]) > 0 { // The user explicitedly wanted to download the file (Dropbox style!)
+        if errParseQuery == nil && len(query["dl"]) > 0 { // The user explicitedly wanted to download the file (Dropbox style!)
                 w.Header().Set("Content-Type", "application/octet-stream")
-        }else if err == nil && len(query["dlenc"]) > 0{
+        }else if errParseQuery == nil && len(query["dlenc"]) > 0{ // Download the file as an encrypted zip
 
                 // Absolute path to the file
                 filePathName := f.Name()
@@ -200,7 +208,7 @@ func serveFile(filePath string, w http.ResponseWriter, req *http.Request) {
                 output_writer.(*zlib.Writer).Close()
         }
 
-        f.Close()
+        //f.Close()
 }
 
 func handleDirectory(f *os.File, w http.ResponseWriter, req *http.Request) {
