@@ -13,3 +13,4 @@
 
 * Hardcoded reverse shell
 * Ability to execute embedded binary
+* Add feature for search and replace in embedded files (for fill the IP address for example)
