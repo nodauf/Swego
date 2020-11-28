@@ -16,21 +16,26 @@ import (
 
 func main() {
         controllers.ParseArgs()
-        http.Handle("/"+*controllers.Public, routers.Use(routers.Router))
+        if controllers.WebCommand.Parsed(){
+            http.Handle("/"+*controllers.Public, routers.Use(routers.Router))
 
-        fmt.Printf("Sharing %s/%s on %s ...\n", *controllers.Root_folder, *controllers.Public, *controllers.Bind)
-        if *controllers.Private != "" {
-            http.Handle("/"+*controllers.Private+"/", routers.Use(routers.Router,controllers.BasicAuth))
-            fmt.Printf("Sharing %s/%s on %s ...\n", *controllers.Root_folder, *controllers.Private, *controllers.Bind)
-        }
-        var err error
-        if *controllers.Tls {
-            err = http.ListenAndServeTLS(":"+(*controllers.Bind), *controllers.Certificate, *controllers.Key,nil)
-        }else{
-            err = http.ListenAndServe(":"+(*controllers.Bind), nil)
-        }
-        if err != nil {
-            log.Fatal("ListenAndServe: ", err)
+            fmt.Printf("Sharing %s/%s on %s ...\n", *controllers.Root_folder, *controllers.Public, *controllers.Bind)
+            if *controllers.Private != "" {
+                http.Handle("/"+*controllers.Private+"/", routers.Use(routers.Router,controllers.BasicAuth))
+                fmt.Printf("Sharing %s/%s on %s ...\n", *controllers.Root_folder, *controllers.Private, *controllers.Bind)
+            }
+            var err error
+            // Check if HTTPS or not
+            if *controllers.Tls {
+                err = http.ListenAndServeTLS(":"+(*controllers.Bind), *controllers.Certificate, *controllers.Key,nil)
+            }else{
+                err = http.ListenAndServe(":"+(*controllers.Bind), nil)
+            }
+            if err != nil {
+                log.Fatal("ListenAndServe: ", err)
+            }
+        } else if controllers.RunCommand.Parsed(){
+
         }
 }
 
