@@ -227,9 +227,9 @@ func handleDirectory(f *os.File, w http.ResponseWriter, req *http.Request) {
         children_files_tmp := list.New()
 
         for _, val := range names {
-                if val.Name()[0] == '.' {
-                        continue
-                } // Remove hidden files from listing
+                //if val.Name()[0] == '.' {
+                //        continue
+                //} // Remove hidden files from listing
 
                 if val.IsDir() {
                         children_dir_tmp.PushBack(val.Name())
