@@ -14,3 +14,4 @@
 
 * Ability to execute embedded binary
 * Add feature for search and replace in embedded files (for fill the IP address for example)
+* JS menu to give command line in powershell, some gtfobins, curl, wget to download and execute 
