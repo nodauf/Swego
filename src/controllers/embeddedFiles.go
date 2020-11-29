@@ -151,7 +151,7 @@ func serveEmbeddedFile(filePath string, w http.ResponseWriter, req *http.Request
         //f.Close()
 }
 
-func handleEmbeddedDirectory(path string, w http.ResponseWriter, req *http.Request) {
+func listEmbeddedFiles()([]string, []string){
 		//Can't use variable, otherwise rice generate an error when rice embed-go ....
         templateBox, err := rice.FindBox("../assets/embedded/")
 		if err != nil {
@@ -173,7 +173,14 @@ func handleEmbeddedDirectory(path string, w http.ResponseWriter, req *http.Reque
             log.Fatal(err)
         }
 
+        // And transfer the content to the final array structure
+        children_dir := utils.CopyToArray(children_dir_tmp)
+        children_files := utils.CopyToArray(children_files_tmp)
 
+        return children_dir, children_files
+}
+
+func handleEmbeddedDirectory(path string, w http.ResponseWriter, req *http.Request) {
 //        names, _ := f.Readdir(-1)
 //
 //        // First, check if there is any index in this folder.
@@ -201,9 +208,8 @@ func handleEmbeddedDirectory(path string, w http.ResponseWriter, req *http.Reque
 //                }
 //        }
 //
-        // And transfer the content to the final array structure
-        children_dir := utils.CopyToArray(children_dir_tmp)
-        children_files := utils.CopyToArray(children_files_tmp)
+        children_dir, children_files := listEmbeddedFiles()
+
         //Sort children_dir and children_files
         sort.Slice(children_dir, func(i, j int) bool { return children_dir[i] < children_dir[j] })
 
@@ -215,8 +221,22 @@ func handleEmbeddedDirectory(path string, w http.ResponseWriter, req *http.Reque
 								 Children_dir: children_dir,
 								 Children_files: children_files,
 								 Embedded: true}
-	    err = renderTemplate(w,"directoryListing.tpl",data)
+        err := renderTemplate(w,"directoryListing.tpl",data)
 	    if err != nil {
 		    fmt.Println(err)
 	}
+}
+
+func readEmbeddedBinary(binary string) []byte{
+		//Can't use variable, otherwise rice generate an error when rice embed-go ....
+        templateBox, err := rice.FindBox("../assets/embedded/")
+		if err != nil {
+            log.Fatal(err)
+        }
+		binBytes, err := templateBox.Bytes(binary)
+		if err != nil {
+			fmt.Printf("[!] Error finding binary: %s\n", binary)
+			log.Fatal(err)
+		}
+		return binBytes
 }
