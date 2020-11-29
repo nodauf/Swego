@@ -9,6 +9,7 @@ import(
 	"log"
 	"bytes"
 	"io"
+    "runtime"
 
     "github.com/GeertJohan/go.rice"
 	"github.com/yeka/zip"
@@ -196,6 +197,11 @@ func ZipDirectory(f *os.File, encrypted bool) string{
 	err = filepath.Walk(directoryPathName,
 		func(path string, info os.FileInfo, err error) error {
 			// Take the relative path from the root directory of the web server
+            // Windows trick
+            if runtime.GOOS == "windows" {
+                directoryPathName = strings.Replace(directoryPathName,"/","\\",-1)
+                path = strings.Replace(path,"/","\\",-1)
+            }
 			zipPath := directoryName + strings.SplitAfter(path,directoryPathName)[1]
 
 			if err != nil {
