@@ -5,7 +5,7 @@ import "os"
 import "fmt"
 import "strings"
 import "SimpleHTTPServer-golang/src/utils"
-
+import "runtime"
 
 // Subcommand
 var WebCommand *flag.FlagSet
@@ -24,17 +24,20 @@ var Key *string
 var Certificate *string
 
 // Run subcommand
-var List *bool
-var Binary *string
-var Args *string
+//var List *bool
+//var Binary *string
+//var Args *string
+var Run bool
+var Binary string
+var Args []string
 
 func ParseArgs(){
 
-        help := flag.Bool("help",false,"Print usage")
-        flag.Parse()
+        //help := flag.Bool("help",false,"Print usage")
+        //flag.Parse()
         // Subcommands
-        WebCommand = flag.NewFlagSet("web", flag.ContinueOnError)
-        RunCommand = flag.NewFlagSet("run", flag.ContinueOnError)
+        WebCommand = flag.NewFlagSet("web", flag.ExitOnError)
+        //RunCommand = flag.NewFlagSet("run", flag.ExitOnError)
 
         cwd, err := os.Getwd()
         if err != nil {
@@ -53,37 +56,59 @@ func ParseArgs(){
         Tls = WebCommand.Bool("tls", false, "Enables HTTPS")
         Key = WebCommand.String("key", "", "HTTPS Key : openssl genrsa -out server.key 2048")
         Certificate = WebCommand.String("certificate", "", "HTTPS certificate : openssl req -new -x509 -sha256 -key server.key -out server.crt -days 365")
+        helpWeb := WebCommand.Bool("help",false,"Print usage")
 
         // Command line parsing for subcommand run
-        List = RunCommand.Bool("list",false,"List the embedded files")
-        Binary = RunCommand.String("binary","","Binary to execute")
-        Args = RunCommand.String("args","","Arguments for the binary")
+        //List = RunCommand.Bool("list",false,"List the embedded files")
+        //Binary = RunCommand.String("binary","","Binary to execute")
+        //Args = RunCommand.String("args","","Arguments for the binary")
+        //helpRun := RunCommand.Bool("help",false,"Print usage")
 
-        if *help {
-            fmt.Println("web subcommand")
-			WebCommand.PrintDefaults()
-            fmt.Println("\nrun subcommand")
-			RunCommand.PrintDefaults()
-			os.Exit(1)
-        }
+        // If nothing is specified run the web server
+        if len(os.Args) == 1 {
+			WebCommand.Parse(os.Args[1:])
+			return
+		}
 
-        if len(os.Args) < 2 {
-            fmt.Println("web or run subcommand is required")
-            os.Exit(1)
-        }
+        //if len(os.Args) < 2 {
+        //    fmt.Println("web or run subcommand is required, default is web")
+        //    //WebCommand.Parse(os.Args[1:])
+        //    os.Exit(1)
+        //}
 
 		switch os.Args[1] {
 			case "web":
 				WebCommand.Parse(os.Args[2:])
 			case "run":
-				RunCommand.Parse(os.Args[2:])
+                if runtime.GOOS == "windows"{
+					// binary missing
+					if len(os.Args) == 2 {
+						showUsageRun()
+						os.Exit(1)
+					}
+					Run = true
+  //                  RunCommand.Parse(os.Args[2:])
+                }else{
+                    fmt.Println("run subcommand only available on Windows not on: "+ runtime.GOOS)
+                }
 			default:
                 fmt.Println("web subcommand")
                 WebCommand.PrintDefaults()
                 fmt.Println("\nrun subcommand")
-                RunCommand.PrintDefaults()
+                showUsageRun()
+                //RunCommand.PrintDefaults()
 				os.Exit(1)
 		}
+        // Show usage if help in any subcommand
+        if *helpWeb {
+            fmt.Println("web subcommand")
+			WebCommand.PrintDefaults()
+            fmt.Println("\nrun subcommand")
+            showUsageRun()
+			//RunCommand.PrintDefaults()
+			os.Exit(1)
+        }
+
 		if WebCommand.Parsed(){
 			if *Private != "" {
 				// Remove if the last character is /
@@ -106,11 +131,27 @@ func ParseArgs(){
 				WebCommand.PrintDefaults()
 				os.Exit(1)
 			}
-	}else if RunCommand.Parsed(){
-        if !*List && *Binary == "" {
-            fmt.Println("You must specify a binary to run")
-            RunCommand.PrintDefaults()
-            os.Exit(1)
-        }
-    }
+		}else if Run { //RunCommand.Parsed(){
+			Binary = os.Args[2]
+			Args = os.Args[3:]
+            fmt.Println(Args)
+//        // If not listing and no binary select
+//        if !*List && *Binary == "" {
+//            fmt.Println("You must specify a binary to run")
+//            RunCommand.PrintDefaults()
+//            os.Exit(1)
+//        }
+//        // If list and binary
+//        if *List && *Binary != "" {
+//            fmt.Println("You must specify either binary or list")
+//            RunCommand.PrintDefaults()
+//            os.Exit(1)
+//        }
+	 }
+}
+
+func showUsageRun(){
+    fmt.Printf("Usage:\n%s run <binary> <args>\n", os.Args[0])
+	fmt.Println("\nPackaged Binaries:")
+	PrintEmbeddedFiles()
 }

@@ -34,8 +34,12 @@ func main() {
             if err != nil {
                 log.Fatal("ListenAndServe: ", err)
             }
-        } else if controllers.RunCommand.Parsed(){
-
+        } else if controllers.Run{
+            if controllers.Binary != ""{
+                controllers.RunEmbeddedBinary(controllers.Binary, controllers.Args)
+            }else{
+                controllers.PrintEmbeddedFiles()
+            }
         }
 }
 
