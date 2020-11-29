@@ -4,11 +4,11 @@ build:
 run:
 	go run webserver.go
 
-assets:
+assetsDir:
 	$(GOGET) go get github.com/GeertJohan/go.rice
 	$(GOPATH)/bin/rice embed-go -i ./controllers
 
-compile: assets
+compile: assetsDir
 	# 32-Bit Systems
 	# Linux
 	CGO_ENABLED=0 GOOS=linux GOARCH=386 go build -o bin/webserver-linux-386 webserver.go
@@ -20,4 +20,5 @@ compile: assets
 	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o bin/webserver-linux-amd64 webserver.go
 	# Windows
 	CGO_ENABLED=0 GOOS=windows GOARCH=amd64 go build -o bin/webserver-windows-amd64.exe webserver.go
-
+	# Remove rice file
+	rm controllers/rice-box.go
