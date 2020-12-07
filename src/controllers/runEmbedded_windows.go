@@ -4,11 +4,18 @@ import (
     "fmt"
     "log"
 
+    "github.com/Binject/go-donut/donut"
+    bananaphone "github.com/C-Sto/BananaPhone/pkg/BananaPhone"
     clr "github.com/ropnop/go-clr"
 )
 
 var TARGET_VERSION = "v2"
 
+func checkFatalErr(err error) {
+	if err != nil {
+		panic(err)
+	}
+}
 
 func PrintEmbeddedFiles(){
     _, children_files := listEmbeddedFiles()
