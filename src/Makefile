@@ -5,7 +5,8 @@ run:
 	go run webserver.go
 
 assetsDir:
-	$(GOGET) go get github.com/GeertJohan/go.rice
+	go get github.com/GeertJohan/go.rice
+	go get github.com/GeertJohan/go.rice/rice
 	$(GOPATH)/bin/rice embed-go -i ./controllers
 
 compile: assetsDir
