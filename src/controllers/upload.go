@@ -48,8 +48,10 @@ func UploadFile(w http.ResponseWriter, r *http.Request) {
         }
 		data := struct {
 			Directory string
+			ServerUA string
 		}{
 			r.URL.Path,
+			serverUA,
 		}
 		err = renderTemplate(w , "upload.tpl", data)
         if err != nil {
