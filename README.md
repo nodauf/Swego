@@ -97,6 +97,7 @@ C:/Users/Nodauf>.\webserver.exe run Rubeus.exe kerberoast
 
 ## Todo
 
+* Ability to use  absolute path for public and private folder
 * Ability to execute embedded binary in C# and C
 * Implement (go-mimikatz)[https://github.com/vyrus001/go-mimikatz]
 * Add feature for search and replace in embedded files (for fill the IP address for example)
