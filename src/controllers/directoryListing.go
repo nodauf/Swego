@@ -26,7 +26,7 @@ import (
 const serverUA = ""
 const fs_maxbufsize = 4096 // 4096 bits = default page size on OSX
 
-func HandleFile(w http.ResponseWriter, req *http.Request) {
+func handleFile(w http.ResponseWriter, req *http.Request) {
         w.Header().Set("Server", serverUA)
 
         filepath := path.Join((*Root_folder), path.Clean(req.URL.Path))
@@ -41,10 +41,10 @@ func serveFile(filePath string, w http.ResponseWriter, req *http.Request) {
         // Content-Type handling
         query, errParseQuery := url.ParseQuery(req.URL.RawQuery)
 
-        if errParseQuery == nil && len(query["embedded"]) > 0{ // Manage embedded files
-            embeddedRequest(w, req)
-            return
-        }
+//        if errParseQuery == nil && len(query["embedded"]) > 0{ // Manage embedded files
+//            embeddedRequest(w, req)
+//            return
+//        }
 
         if err != nil {
                 http.Error(w, "404 Not Found : Error while opening the file.", 404)
