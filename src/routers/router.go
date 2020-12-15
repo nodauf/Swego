@@ -14,7 +14,8 @@ func Router(w http.ResponseWriter, req *http.Request) {
                 req.UserAgent()) // TODO: Improve this crappy logging
         switch req.Method {
     case "GET":
-         controllers.HandleFile(w, req)
+         //controllers.HandleFile(w, req)
+         controllers.ParseHttpParameter(w, req)
     case "POST":
         // Call ParseForm() to parse the raw query and update r.PostForm and r.Form.
         if err := req.ParseForm(); err != nil {
