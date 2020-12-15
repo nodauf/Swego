@@ -6,7 +6,8 @@ import "SimpleHTTPServer-golang/src/controllers"
 
 // Routing function
 func Router(w http.ResponseWriter, req *http.Request) {
-        fmt.Printf("\"%s %s %s\" \"%s\" \"%s\"\n",
+        fmt.Printf("\"%s %s %s %s\" \"%s\" \"%s\"\n",
+                req.RemoteAddr,
                 req.Method,
                 req.URL.String(),
                 req.Proto,
