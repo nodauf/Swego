@@ -94,6 +94,7 @@ C:/Users/Nodauf>.\webserver.exe run Rubeus.exe kerberoast
 * Download folder with a zip
 * Embedded files
 * Run embedded binary written in C# (only available on Windows)
+* Create a folder from the browser
 
 ## Todo
 
@@ -102,4 +103,3 @@ C:/Users/Nodauf>.\webserver.exe run Rubeus.exe kerberoast
 * Implement (go-mimikatz)[https://github.com/vyrus001/go-mimikatz]
 * Add feature for search and replace in embedded files (for fill the IP address for example)
 * JS/CSS menu to give command line in powershell, some gtfobins, curl, wget to download and execute 
-* Create a folder for the browser
