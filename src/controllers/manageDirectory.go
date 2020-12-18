@@ -9,7 +9,7 @@ import (
 	"strings"
 )
 
-func createFolder(w http.ResponseWriter, req *http.Request){
+func CreateFolder(w http.ResponseWriter, req *http.Request){
         dirPath := path.Join((*Root_folder), path.Clean(req.URL.Path))
         query, errParseQuery := url.ParseQuery(req.URL.RawQuery)
 		folder := query["newFolder"][0]

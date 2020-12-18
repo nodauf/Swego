@@ -1,8 +1,9 @@
-package controllers
+package routers
 
 import (
     "net/http"
     "net/url"
+    "SimpleHTTPServer-golang/src/controllers"
 )
 
 func ParseHttpParameter(w http.ResponseWriter, req *http.Request){
@@ -10,12 +11,12 @@ func ParseHttpParameter(w http.ResponseWriter, req *http.Request){
 
         if errParseQuery == nil {
             if len(query["embedded"]) > 0{ // Manage embedded files
-                embeddedRequest(w, req)
+                controllers.EmbeddedRequest(w, req)
                 return
             }else if len(query["newFolder"]) > 0{
-                createFolder(w, req)
+                controllers.CreateFolder(w, req)
                return
             }
         }
-        handleFile(w, req)
+        controllers.HandleFile(w, req)
 }

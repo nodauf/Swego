@@ -24,7 +24,7 @@ import (
 
 const pathEmbedded = "./assets/embedded/"
 
-func embeddedRequest(w http.ResponseWriter, req *http.Request) {
+func EmbeddedRequest(w http.ResponseWriter, req *http.Request) {
     requestPath := strings.Split(req.RequestURI,"?")[0]
 
 	if requestPath[len(requestPath)-1:] == "/" { // Directory listing if it's a folder (last character is /)
