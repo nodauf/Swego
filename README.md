@@ -20,8 +20,6 @@ web subcommand
     	Password for basic auth, default: notsecure (default "notsecure")
   -private string
     	Private folder with basic auth, default /tmp/SimpleHTTPServer-golang/src/bin/private (default "private")
-  -public string
-    	Default /home/florian/SimpleHTTPServer-golang/src/bin public folder
   -root string
     	Root folder (default "/tmp/SimpleHTTPServer-golang/src/bin")
   -tls
@@ -72,11 +70,18 @@ Sharing /tmp/ on 8080 ...
 Sharing /tmp/private on 8080 ...
 ```
 
-### Web server using private directory
+### Web server using private directory and root directory
 ```
 $ ./webserver-linux-amd64 web -private ThePrivateFolder -username nodauf -password nodauf
 Sharing /tmp/ on 8080 ...
 Sharing /tmp/ThePrivateFolder on 8080 ...
+```
+
+Different path for root and private directory
+```
+$ ./webserver-linux-amd64 web -private /tmp/private -root /home/nodauf -username nodauf -password nodauf
+Sharing /home/nodauf on 8080 ...
+Sharing /tmp/private on 8080 ...
 ```
 
 ### Run embedded binary
@@ -98,7 +103,6 @@ C:/Users/Nodauf>.\webserver.exe run Rubeus.exe kerberoast
 
 ## Todo
 
-* Ability to use  absolute path for public and private folder
 * Ability to execute embedded binary in C# and C
 * Implement (go-mimikatz)[https://github.com/vyrus001/go-mimikatz]
 * Add feature for search and replace in embedded files (for fill the IP address for example)
