@@ -26,10 +26,14 @@ import (
 const serverUA = ""
 const fs_maxbufsize = 4096 // 4096 bits = default page size on OSX
 
-func handleFile(w http.ResponseWriter, req *http.Request) {
+func HandleFile(w http.ResponseWriter, req *http.Request) {
         w.Header().Set("Server", serverUA)
 
         filepath := path.Join((*Root_folder), path.Clean(req.URL.Path))
+        if req.URL.Path == "/private/"{
+            req.URL.Path = strings.Replace(req.URL.Path,"/private/","",1)
+            filepath = path.Join((*Private), path.Clean(req.URL.Path))
+        }
         serveFile(filepath, w, req)
 
 }

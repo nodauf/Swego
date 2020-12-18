@@ -6,6 +6,7 @@ import "fmt"
 import "strings"
 import "SimpleHTTPServer-golang/src/utils"
 import "runtime"
+import "path"
 
 // Subcommand
 var WebCommand *flag.FlagSet
@@ -108,13 +109,15 @@ func ParseArgs(){
 			//RunCommand.PrintDefaults()
 			os.Exit(1)
         }
-
 		if WebCommand.Parsed(){
 			if *Private != "" {
 				// Remove if the last character is /
 				if strings.HasSuffix(*Private,"/"){
 					*Private = utils.TrimSuffix(*Private, "/")
-				}
+                }
+                if !strings.HasPrefix(*Private, "/"){
+                    *Private = path.Join((*Root_folder), *Private)
+                }
 			}
 			if *Public != "" {
 				// Remove if the last character is /

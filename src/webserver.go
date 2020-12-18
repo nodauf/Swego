@@ -21,8 +21,8 @@ func main() {
 
             fmt.Printf("Sharing %s/%s on %s ...\n", *controllers.Root_folder, *controllers.Public, *controllers.Bind)
             if *controllers.Private != "" {
-                http.Handle("/"+*controllers.Private+"/", routers.Use(routers.Router,controllers.BasicAuth))
-                fmt.Printf("Sharing %s/%s on %s ...\n", *controllers.Root_folder, *controllers.Private, *controllers.Bind)
+                http.Handle("/private/", routers.Use(routers.Router,controllers.BasicAuth))
+                fmt.Printf("Sharing private %s on %s ...\n",  *controllers.Private, *controllers.Bind)
             }
             var err error
             // Check if HTTPS or not

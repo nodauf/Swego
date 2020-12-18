@@ -1,14 +1,11 @@
 package controllers
 
 import "net/http"
-import "fmt"
 import "strings"
 import "encoding/base64"
 
-
 func BasicAuth(h http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-        fmt.Println(*Root_folder)
 		w.Header().Set("WWW-Authenticate", `Basic realm="Restricted"`)
 
 		s := strings.SplitN(r.Header.Get("Authorization"), " ", 2)
@@ -33,7 +30,8 @@ func BasicAuth(h http.HandlerFunc) http.HandlerFunc {
 			http.Error(w, "Not authorized", 401)
 			return
 		}
-
-		h.ServeHTTP(w, r)
-	}
+        //fmt.Println("Serving: "+ path.Join((*Private), path.Clean(r.URL.Path)))
+//		h.ServeHTTP(w, r)
+		HandleFile(w, r)
+    }
 }
