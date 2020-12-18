@@ -17,9 +17,9 @@ import (
 func main() {
         controllers.ParseArgs()
         if controllers.WebCommand.Parsed(){
-            http.Handle("/"+*controllers.Public, routers.Use(routers.Router))
+            http.Handle("/", routers.Use(routers.Router))
 
-            fmt.Printf("Sharing %s/%s on %s ...\n", *controllers.Root_folder, *controllers.Public, *controllers.Bind)
+            fmt.Printf("Sharing %s on %s ...\n", *controllers.Root_folder, *controllers.Bind)
             if *controllers.Private != "" {
                 http.Handle("/private/", routers.Use(routers.Router,controllers.BasicAuth))
                 fmt.Printf("Sharing private %s on %s ...\n",  *controllers.Private, *controllers.Bind)

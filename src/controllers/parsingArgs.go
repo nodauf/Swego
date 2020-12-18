@@ -18,7 +18,6 @@ var Root_folder *string
 var Username *string
 var Password *string
 var Uses_gzip *bool
-var Public *string
 var Private *string
 var Tls *bool
 var Key *string
@@ -49,7 +48,6 @@ func ParseArgs(){
         // Command line parsing for subcommand web
         Bind = WebCommand.String("bind", "8080", "Bind Port")
         Root_folder = WebCommand.String("root", cwd, "Root folder")
-        Public = WebCommand.String("public", "", "Default " + cwd + " public folder")
         Private = WebCommand.String("private", "private", "Private folder with basic auth, default " + cwd + "/private")
         Username = WebCommand.String("username", "admin", "Username for basic auth, default: admin")
         Password = WebCommand.String("password", "notsecure", "Password for basic auth, default: notsecure")
@@ -115,15 +113,10 @@ func ParseArgs(){
 				if strings.HasSuffix(*Private,"/"){
 					*Private = utils.TrimSuffix(*Private, "/")
                 }
+                // If relative path
                 if !strings.HasPrefix(*Private, "/"){
                     *Private = path.Join((*Root_folder), *Private)
                 }
-			}
-			if *Public != "" {
-				// Remove if the last character is /
-				if strings.HasSuffix(*Public,"/"){
-					*Public = utils.TrimSuffix(*Public, "/")
-				}
 			}
 			if (*Tls || *Key != "" || *Certificate != "") && (!*Tls || *Key == "" || *Certificate == ""){
 				fmt.Print("Tls, certificate and/or key arguments missing\n")
