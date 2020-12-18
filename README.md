@@ -84,7 +84,7 @@ Sharing /home/nodauf on 8080 ...
 Sharing /tmp/private on 8080 ...
 ```
 
-### Run embedded binary
+### Run embedded binary (only on Windows)
 ```
 C:/Users/Nodauf>.\webserver.exe run Rubeus.exe kerberoast 
 ```
