@@ -11,8 +11,6 @@ import (
 	bananaphone "github.com/C-Sto/BananaPhone/pkg/BananaPhone"
 )
 
-var TARGET_VERSION = "v2"
-
 func checkFatalErr(err error) {
 	if err != nil {
 		panic(err)
@@ -28,7 +26,7 @@ func PrintEmbeddedFiles() {
 
 func RunEmbeddedBinary(binary string, arguments []string) {
 	binaryBytes := readEmbeddedBinary(binary)
-	argumentBinary := " "
+	argumentBinary := " " // trick use empty argument if no one is given
 	if len(arguments) > 0 {
 		argumentBinary = arguments[0]
 	}
