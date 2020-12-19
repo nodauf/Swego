@@ -147,7 +147,7 @@ func ParseArgs(){
 }
 
 func showUsageRun(){
-    fmt.Printf("Usage:\n%s run <binary> <args>\n", os.Args[0])
+    fmt.Printf("Usage:\n%s run <binary> \"<args>\"\n", os.Args[0])
 	fmt.Println("\nPackaged Binaries:")
 	PrintEmbeddedFiles()
 }
