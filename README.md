@@ -71,13 +71,16 @@ Sharing /tmp/private on 8080 ...
 ```
 
 ### Web server using private directory and root directory
+
+#### Private folder on same directory
+
 ```
 $ ./webserver-linux-amd64 web -private ThePrivateFolder -username nodauf -password nodauf
 Sharing /tmp/ on 8080 ...
 Sharing /tmp/ThePrivateFolder on 8080 ...
 ```
 
-Different path for root and private directory
+#### Different path for root and private directory
 ```
 $ ./webserver-linux-amd64 web -private /tmp/private -root /home/nodauf -username nodauf -password nodauf
 Sharing /home/nodauf on 8080 ...
@@ -86,7 +89,7 @@ Sharing /tmp/private on 8080 ...
 
 ### Embedded binary (only on Windows)
 
-List the embedded binaries:
+#### List the embedded binaries:
 
 ```
 C:\Users\Nodauf>.\webserver.exe run  
@@ -100,7 +103,7 @@ php-reverse-shell.php
 plink.exe
 ```
 
-Run binary with arguments:
+#### Run binary with arguments:
 
 ```
 C:\Users\Nodauf>.\webserver.exe run mimikatz.exe "privilege::debug sekurlsa::logonpasswords"
