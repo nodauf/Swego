@@ -133,6 +133,5 @@ Running binary this way could help bypassing AV protections. Sometimes the argum
 
 ## Todo
 
-* Implement (go-mimikatz)[https://github.com/vyrus001/go-mimikatz]
 * Add feature for search and replace in embedded files (for fill the IP address for example)
 * JS/CSS menu to give command line in powershell, some gtfobins, curl, wget to download and execute 
