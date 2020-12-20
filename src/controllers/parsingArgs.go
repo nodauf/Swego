@@ -111,7 +111,6 @@ func ParseArgs() {
 			os.Exit(1)
 		}
 	} else if RunCommand.Parsed() {
-		fmt.Println("Parse run")
 		if !*List && *Binary == "" {
 			fmt.Println("You must specify a binary to run")
 			RunCommand.PrintDefaults()
