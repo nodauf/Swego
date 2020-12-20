@@ -24,11 +24,11 @@ func PrintEmbeddedFiles() {
 	}
 }
 
-func RunEmbeddedBinary(binary string, arguments []string) {
+func RunEmbeddedBinary(binary string, arguments string) {
 	binaryBytes := readEmbeddedBinary(binary)
 	argumentBinary := " " // trick use empty argument if no one is given
-	if len(arguments) > 0 {
-		argumentBinary = arguments[0]
+	if arguments != "" {
+		argumentBinary = arguments
 	}
 
 	shellcode, err := donut.ShellcodeFromBytes(bytes.NewBuffer(binaryBytes), &donut.DonutConfig{

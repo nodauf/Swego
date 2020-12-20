@@ -6,42 +6,39 @@ uses lighttpd's directory listing HTML template. */
 package main
 
 import (
-    "net/http"
-    "fmt"
-    "log"
+	"fmt"
+	"log"
+	"net/http"
 
-    "SimpleHTTPServer-golang/src/routers"
-    "SimpleHTTPServer-golang/src/controllers"
+	"SimpleHTTPServer-golang/src/controllers"
+	"SimpleHTTPServer-golang/src/routers"
 )
 
 func main() {
-        controllers.ParseArgs()
-        if controllers.WebCommand.Parsed(){
-            http.Handle("/", routers.Use(routers.Router))
+	controllers.ParseArgs()
+	if controllers.WebCommand.Parsed() {
+		http.Handle("/", routers.Use(routers.Router))
 
-            fmt.Printf("Sharing %s on %s ...\n", *controllers.Root_folder, *controllers.Bind)
-            if *controllers.Private != "" {
-                http.Handle("/private/", routers.Use(routers.Router,controllers.BasicAuth))
-                fmt.Printf("Sharing private %s on %s ...\n",  *controllers.Private, *controllers.Bind)
-            }
-            var err error
-            // Check if HTTPS or not
-            if *controllers.Tls {
-                err = http.ListenAndServeTLS(":"+(*controllers.Bind), *controllers.Certificate, *controllers.Key,nil)
-            }else{
-                err = http.ListenAndServe(":"+(*controllers.Bind), nil)
-            }
-            if err != nil {
-                log.Fatal("ListenAndServe: ", err)
-            }
-        } else if controllers.Run{
-            if controllers.Binary != ""{
-                controllers.RunEmbeddedBinary(controllers.Binary, controllers.Args)
-            }else{
-                controllers.PrintEmbeddedFiles()
-            }
-        }
+		fmt.Printf("Sharing %s on %s ...\n", *controllers.Root_folder, *controllers.Bind)
+		if *controllers.Private != "" {
+			http.Handle("/private/", routers.Use(routers.Router, controllers.BasicAuth))
+			fmt.Printf("Sharing private %s on %s ...\n", *controllers.Private, *controllers.Bind)
+		}
+		var err error
+		// Check if HTTPS or not
+		if *controllers.Tls {
+			err = http.ListenAndServeTLS(":"+(*controllers.Bind), *controllers.Certificate, *controllers.Key, nil)
+		} else {
+			err = http.ListenAndServe(":"+(*controllers.Bind), nil)
+		}
+		if err != nil {
+			log.Fatal("ListenAndServe: ", err)
+		}
+	} else if controllers.RunCommand.Parsed() {
+		if *controllers.Binary != "" {
+			controllers.RunEmbeddedBinary(*controllers.Binary, *controllers.Args)
+		} else {
+			controllers.PrintEmbeddedFiles()
+		}
+	}
 }
-
-
-

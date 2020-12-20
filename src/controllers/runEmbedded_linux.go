@@ -14,7 +14,7 @@ func PrintEmbeddedFiles(){
 }
 
 // To avoid generating error on Linux
-func RunEmbeddedBinary(binary string, arguments []string){
+func RunEmbeddedBinary(binary string, arguments string){
 
 }
 
