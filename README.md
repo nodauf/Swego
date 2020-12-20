@@ -1,6 +1,6 @@
 # Sawego
 
-Swiss Army Wknife ebserver in Golang.
+Swiss army knife Webserver in Golang.
 Keep simple like the python SimpleHTTPServer but with many features
 
 ## Usage
