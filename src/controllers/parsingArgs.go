@@ -15,7 +15,7 @@ var WebCommand *flag.FlagSet
 var RunCommand *flag.FlagSet
 
 // Web subcommand
-var Bind *string
+var Bind *int
 var Root_folder *string
 var Username *string
 var Password *string
@@ -24,6 +24,7 @@ var Private *string
 var Tls *bool
 var Key *string
 var Certificate *string
+var IP *string
 
 // Run subcommand
 var List *bool
@@ -45,7 +46,7 @@ func ParseArgs() {
 	}
 
 	// Command line parsing for subcommand web
-	Bind = WebCommand.String("bind", "8080", "Bind Port")
+	Bind = WebCommand.Int("bind", 8080, "Bind Port")
 	Root_folder = WebCommand.String("root", cwd, "Root folder")
 	Private = WebCommand.String("private", "private", "Private folder with basic auth, default "+cwd+"/private")
 	Username = WebCommand.String("username", "admin", "Username for basic auth, default: admin")
@@ -54,6 +55,7 @@ func ParseArgs() {
 	Tls = WebCommand.Bool("tls", false, "Enables HTTPS")
 	Key = WebCommand.String("key", "", "HTTPS Key : openssl genrsa -out server.key 2048")
 	Certificate = WebCommand.String("certificate", "", "HTTPS certificate : openssl req -new -x509 -sha256 -key server.key -out server.crt -days 365")
+	IP = WebCommand.String("ip", "0.0.0.0", "IP to bind")
 	helpWeb := WebCommand.Bool("help", false, "Print usage")
 
 	// Command line parsing for subcommand run
