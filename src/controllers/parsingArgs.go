@@ -62,10 +62,9 @@ func ParseArgs() {
 	Args = RunCommand.String("args", "", "Arguments for the binary")
 	helpRun := RunCommand.Bool("help", false, "Print usage")
 
-	// If this is not run subcommand
-	if os.Args[1] != "run" {
+	// If this is not run subcommand use web subcommand as default
+	if len(os.Args) == 1 || ( len(os.Args) > 1 && os.Args[1] != "run" ) {
 		WebCommand.Parse(os.Args[1:])
-		//return
 	}
 
 	// If the second argument is a subcommand
