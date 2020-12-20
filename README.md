@@ -1,4 +1,7 @@
-# SimpleHTTPServer-golang
+# Sawego
+
+Swiss Army Webserver in Golang.
+Keep simple like the python SimpleHTTPServer but with many features
 
 ## Usage
 
