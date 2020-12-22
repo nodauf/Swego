@@ -126,7 +126,7 @@ Running binary this way could help bypassing AV protections. Sometimes the argum
 * HTTPS
 * Directory listing
 * Define a private folder with basic authentication
-* Upload file
+* Upload multiple files
 * Download file as an encrypted zip (password: infected)
 * Download folder with a zip
 * Embedded files
