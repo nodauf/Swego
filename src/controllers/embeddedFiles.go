@@ -7,19 +7,18 @@ import (
 	"fmt"
 	"io"
 	"log"
-	"mime"
 	"net/http"
 	"net/url"
 	"os"
-	"path"
 	"sort"
 	"strconv"
 	"strings"
 
-	rice "github.com/GeertJohan/go.rice"
-	"github.com/yeka/zip"
-
 	"SimpleHTTPServer-golang/src/utils"
+
+	rice "github.com/GeertJohan/go.rice"
+	"github.com/gabriel-vasile/mimetype"
+	"github.com/yeka/zip"
 )
 
 const pathEmbedded = "./assets/embedded/"
@@ -45,7 +44,6 @@ func serveEmbeddedFile(filePath string, w http.ResponseWriter, req *http.Request
 	// Opening the file handle
 	//f, err := os.Open(filePath)
 	f, err := templateBox.Open(filePath)
-
 	// Content-Type handling
 	query, errParseQuery := url.ParseQuery(req.URL.RawQuery)
 
@@ -58,6 +56,12 @@ func serveEmbeddedFile(filePath string, w http.ResponseWriter, req *http.Request
 
 	// Checking if the opened handle is really a file
 	statinfo, err := f.Stat()
+
+	//buf := make([]byte, utils.Min(fs_maxbufsize, statinfo.Size()))
+	//buf := make([]byte, statinfo.Size())
+	//fmt.Println(len(buf))
+	//f.Read(buf)
+
 	if err != nil || errParseQuery != nil {
 		http.Error(w, "500 Internal Error : stat() failure.", 500)
 		log.Println("500 Internal Error : stat() failure for the file: " + filePath)
@@ -93,9 +97,12 @@ func serveEmbeddedFile(filePath string, w http.ResponseWriter, req *http.Request
 		os.Remove(zipFilePath)
 		return
 	} else {
+		// Need its own rice.file otherwise it will miss the first chunck
+		fileForMime, _ := templateBox.Open(filePath)
+		defer fileForMime.Close()
 		// Fetching file's mimetype and giving it to the browser
-		if mimetype := mime.TypeByExtension(path.Ext(filePath)); mimetype != "" {
-			w.Header().Set("Content-Type", mimetype)
+		if mimetype, _ := mimetype.DetectReader(fileForMime); mimetype.String() != "" {
+			w.Header().Set("Content-Type", mimetype.String())
 		} else {
 			w.Header().Set("Content-Type", "application/octet-stream")
 		}
@@ -136,8 +143,10 @@ func serveEmbeddedFile(filePath string, w http.ResponseWriter, req *http.Request
 	// Stream data out !
 	buf := make([]byte, utils.Min(fs_maxbufsize, statinfo.Size()))
 	n := 0
+
 	for err == nil {
 		n, err = f.Read(buf)
+		buf = utils.SearchAndReplace(SearchAndReplaceMap, buf)
 		output_writer.Write(buf[0:n])
 	}
 	// Closes current compressors
