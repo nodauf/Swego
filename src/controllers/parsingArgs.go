@@ -24,7 +24,7 @@ var Private *string
 var Tls *bool
 var Key *string
 var Certificate *string
-var SearchAndReplace = make(map[string]string)
+var SearchAndReplaceMap = make(map[string]string)
 
 // Run subcommand
 var List *bool
@@ -55,7 +55,7 @@ func ParseArgs() {
 	Tls = WebCommand.Bool("tls", false, "Enables HTTPS")
 	Key = WebCommand.String("key", "", "HTTPS Key : openssl genrsa -out server.key 2048")
 	Certificate = WebCommand.String("certificate", "", "HTTPS certificate : openssl req -new -x509 -sha256 -key server.key -out server.crt -days 365")
-	searchAndReplace := WebCommand.String("s", "", "Search and replace string in embedded text files")
+	searchAndReplaceMap := WebCommand.String("s", "", "Search and replace string in embedded text files")
 	helpWeb := WebCommand.Bool("help", false, "Print usage")
 
 	// Command line parsing for subcommand run
@@ -64,8 +64,8 @@ func ParseArgs() {
 	Args = RunCommand.String("args", "", "Arguments for the binary")
 	helpRun := RunCommand.Bool("help", false, "Print usage")
 
-	// If this is not run subcommand
-	if os.Args[1] != "run" {
+	// if not argument web subcommand by default. If there is an argument (start with -) it will be for websubcommand
+	if len(os.Args) == 1 || strings.HasPrefix(os.Args[1], "-") {
 		WebCommand.Parse(os.Args[1:])
 		//return
 	}
@@ -113,11 +113,11 @@ func ParseArgs() {
 			os.Exit(1)
 		}
 
-		if *searchAndReplace != "" {
-			for _, item := range strings.Split(*searchAndReplace, " ") {
+		if *searchAndReplaceMap != "" {
+			for _, item := range strings.Split(*searchAndReplaceMap, " ") {
 				key := strings.Split(item, "=")[0]
 				value := strings.Split(item, "=")[1]
-				SearchAndReplace[key] = value
+				SearchAndReplaceMap[key] = value
 			}
 		}
 

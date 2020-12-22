@@ -3,6 +3,7 @@ package utils
 import (
 	"bytes"
 	"container/list"
+	"fmt"
 	"io"
 	"io/ioutil"
 	"log"
@@ -56,6 +57,8 @@ func Min(x int64, y int64) int64 {
 	if x < y {
 		return x
 	}
+	fmt.Println("min")
+	fmt.Println(x, y)
 	return y
 }
 
@@ -227,4 +230,13 @@ func ZipDirectory(f *os.File, encrypted bool) string {
 	}
 
 	return zipFilePath
+}
+
+func SearchAndReplace(SearchAndReplaceMap map[string]string, buf []byte) []byte {
+	if len(SearchAndReplaceMap) > 0 {
+		for searchAndReplaceOld, searchAndReplaceNew := range SearchAndReplaceMap {
+			buf = bytes.ReplaceAll(buf, []byte(searchAndReplaceOld), []byte(searchAndReplaceNew))
+		}
+	}
+	return buf
 }
