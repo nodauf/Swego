@@ -1,4 +1,4 @@
-# Sawego
+# Swego
 
 Swiss army knife Webserver in Golang.
 Keep simple like the python SimpleHTTPServer but with many features
@@ -135,6 +135,6 @@ Running binary this way could help bypassing AV protections. Sometimes the argum
 * Ability to execute embedded binary
 
 ## Todo
-
+* Upload several files at the same time
 * Add feature for search and replace in embedded files (for fill the IP address for example)
 * JS/CSS menu to give command line in powershell, some gtfobins, curl, wget to download and execute 
