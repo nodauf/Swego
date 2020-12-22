@@ -138,3 +138,5 @@ Running binary this way could help bypassing AV protections. Sometimes the argum
 * Upload several files at the same time
 * Add feature for search and replace in embedded files (for fill the IP address for example)
 * JS/CSS menu to give command line in powershell, some gtfobins, curl, wget to download and execute 
+* Config file for the search and replace (Useful for default config)
+* Use regex for search and replace

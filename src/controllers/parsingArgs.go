@@ -25,6 +25,7 @@ var Tls *bool
 var Key *string
 var Certificate *string
 var IP *string
+var SearchAndReplaceMap = make(map[string]string)
 
 // Run subcommand
 var List *bool
@@ -56,6 +57,7 @@ func ParseArgs() {
 	Key = WebCommand.String("key", "", "HTTPS Key : openssl genrsa -out server.key 2048")
 	Certificate = WebCommand.String("certificate", "", "HTTPS certificate : openssl req -new -x509 -sha256 -key server.key -out server.crt -days 365")
 	IP = WebCommand.String("ip", "0.0.0.0", "IP to bind")
+	searchAndReplaceMap := WebCommand.String("s", "", "Search and replace string in embedded text files")
 	helpWeb := WebCommand.Bool("help", false, "Print usage")
 
 	// Command line parsing for subcommand run
@@ -64,8 +66,8 @@ func ParseArgs() {
 	Args = RunCommand.String("args", "", "Arguments for the binary")
 	helpRun := RunCommand.Bool("help", false, "Print usage")
 
-	// If this is not run subcommand use web subcommand as default
-	if len(os.Args) == 1 || ( len(os.Args) > 1 && os.Args[1] != "run" ) {
+	// if not argument web subcommand by default. If there is an argument (start with -) it will be for websubcommand
+	if len(os.Args) == 1 || strings.HasPrefix(os.Args[1], "-") {
 		WebCommand.Parse(os.Args[1:])
 	}
 
@@ -111,6 +113,15 @@ func ParseArgs() {
 			WebCommand.PrintDefaults()
 			os.Exit(1)
 		}
+
+		if *searchAndReplaceMap != "" {
+			for _, item := range strings.Split(*searchAndReplaceMap, " ") {
+				key := strings.Split(item, "=")[0]
+				value := strings.Split(item, "=")[1]
+				SearchAndReplaceMap[key] = value
+			}
+		}
+
 	} else if RunCommand.Parsed() {
 		if !*List && *Binary == "" {
 			fmt.Println("You must specify a binary to run")
