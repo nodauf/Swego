@@ -5,6 +5,17 @@ Keep simple like the python SimpleHTTPServer but with many features
 
 ## Usage
 
+### Run the binary
+
+If you don't want to build it, binaries are availables on https://github.com/nodauf/Swego/releases
+
+Otherwise, `build-essential` should be installed an `GOPATH` configured:
+```
+git clone https://github.com/nodauf/Swego.git
+cd Swego/src
+make compileLinux # Or make compileWindows
+```
+
 ### Help
 ```
 $ ./webserver -help
