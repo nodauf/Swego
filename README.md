@@ -9,7 +9,7 @@ Keep simple like the python SimpleHTTPServer but with many features
 
 If you don't want to build it, binaries are availables on https://github.com/nodauf/Swego/releases
 
-Otherwise, `build-essential` should be installed an `GOPATH` configured:
+Otherwise, `build-essential` should be installed and `GOPATH` configured:
 ```
 git clone https://github.com/nodauf/Swego.git
 cd Swego/src
@@ -148,5 +148,6 @@ Running binary this way could help bypassing AV protections. Sometimes the argum
 
 ## Todo
 * JS/CSS menu to give command line in powershell, some gtfobins, curl, wget to download and execute 
-* Config file for the search and replace (Useful for default config)
+* Config file for the search and replace (Useful for default config) and other features
 * Use regex for search and replace
+* Using virtual file system to manage embedded files
