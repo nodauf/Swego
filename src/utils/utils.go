@@ -240,3 +240,10 @@ func SearchAndReplace(SearchAndReplaceMap map[string]string, buf []byte) []byte 
 	}
 	return buf
 }
+
+func Check(e error, customMessage string) {
+	if e != nil {
+		fmt.Println(customMessage)
+		panic(e)
+	}
+}
