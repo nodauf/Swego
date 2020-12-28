@@ -26,6 +26,7 @@ var Key *string
 var Certificate *string
 var IP *string
 var SearchAndReplaceMap = make(map[string]string)
+var Oneliners *bool
 
 // Run subcommand
 var List *bool
@@ -58,6 +59,7 @@ func ParseArgs() {
 	Certificate = WebCommand.String("certificate", "", "HTTPS certificate : openssl req -new -x509 -sha256 -key server.key -out server.crt -days 365")
 	IP = WebCommand.String("ip", "0.0.0.0", "IP to bind")
 	searchAndReplaceMap := WebCommand.String("s", "", "Search and replace string in embedded text files")
+	Oneliners = WebCommand.Bool("i", false, "Interactive oneliner")
 	helpWeb := WebCommand.Bool("help", false, "Print usage")
 
 	// Command line parsing for subcommand run
