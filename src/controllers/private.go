@@ -1,8 +1,10 @@
 package controllers
 
-import "net/http"
-import "strings"
-import "encoding/base64"
+import (
+	"encoding/base64"
+	"net/http"
+	"strings"
+)
 
 func BasicAuth(h http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -30,8 +32,8 @@ func BasicAuth(h http.HandlerFunc) http.HandlerFunc {
 			http.Error(w, "Not authorized", 401)
 			return
 		}
-        //fmt.Println("Serving: "+ path.Join((*Private), path.Clean(r.URL.Path)))
-//		h.ServeHTTP(w, r)
+		//fmt.Println("Serving: "+ path.Join((*Private), path.Clean(r.URL.Path)))
+		//		h.ServeHTTP(w, r)
 		HandleFile(w, r)
-    }
+	}
 }
