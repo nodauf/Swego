@@ -98,11 +98,11 @@ func ParseArgs() {
 	if WebCommand.Parsed() {
 		if *Root_folder != "" {
 			// Remove if the last character is /
-			if strings.HasSuffix(*Private, "/") {
+			if strings.HasSuffix(*Root_folder, "/") {
 				*Root_folder = utils.TrimSuffix(*Root_folder, "/")
 			}
 			// If relative path
-			if !strings.HasPrefix(*Private, "/") {
+			if !strings.HasPrefix(*Root_folder, "/") {
 				*Root_folder = path.Join((cwd), *Root_folder)
 			}
 		}
