@@ -220,46 +220,48 @@ func serveFile(filePath string, w http.ResponseWriter, req *http.Request) {
 }
 
 func handleDirectory(f *os.File, w http.ResponseWriter, req *http.Request) {
-	names, _ := f.Readdir(-1)
+	if !*DisableDirectoryListing {
+		names, _ := f.Readdir(-1)
 
-	// First, check if there is any index in this folder.
-	for _, val := range names {
-		if val.Name() == "index.html" {
-			serveFile(path.Join(f.Name(), "index.html"), w, req)
-			return
+		// First, check if there is any index in this folder.
+		for _, val := range names {
+			if val.Name() == "index.html" {
+				serveFile(path.Join(f.Name(), "index.html"), w, req)
+				return
+			}
 		}
-	}
 
-	// Otherwise, generate folder content.
-	children_dir_tmp := list.New()
-	children_files_tmp := list.New()
+		// Otherwise, generate folder content.
+		children_dir_tmp := list.New()
+		children_files_tmp := list.New()
 
-	for _, val := range names {
-		//if val.Name()[0] == '.' {
-		//        continue
-		//} // Remove hidden files from listing
+		for _, val := range names {
+			//if val.Name()[0] == '.' {
+			//        continue
+			//} // Remove hidden files from listing
 
-		if val.IsDir() {
-			children_dir_tmp.PushBack(val.Name())
-		} else {
-			children_files_tmp.PushBack(val.Name())
+			if val.IsDir() {
+				children_dir_tmp.PushBack(val.Name())
+			} else {
+				children_files_tmp.PushBack(val.Name())
+			}
 		}
-	}
 
-	// And transfer the content to the final array structure
-	children_dir := utils.CopyToArray(children_dir_tmp)
-	children_files := utils.CopyToArray(children_files_tmp)
-	//Sort children_dir and children_files
-	sort.Slice(children_dir, func(i, j int) bool { return children_dir[i] < children_dir[j] })
+		// And transfer the content to the final array structure
+		children_dir := utils.CopyToArray(children_dir_tmp)
+		children_files := utils.CopyToArray(children_files_tmp)
+		//Sort children_dir and children_files
+		sort.Slice(children_dir, func(i, j int) bool { return children_dir[i] < children_dir[j] })
 
-	//Sort children_dir and children_files
-	sort.Slice(children_files, func(i, j int) bool { return children_files[i] < children_files[j] })
+		//Sort children_dir and children_files
+		sort.Slice(children_files, func(i, j int) bool { return children_files[i] < children_files[j] })
 
-	data := utils.Dirlisting{Name: req.URL.Path, ServerUA: serverUA,
-		Children_dir: children_dir, Children_files: children_files}
-	err := renderTemplate(w, "directoryListing.tpl", data)
-	if err != nil {
-		fmt.Println(err)
+		data := utils.Dirlisting{Name: req.URL.Path, ServerUA: serverUA,
+			Children_dir: children_dir, Children_files: children_files}
+		err := renderTemplate(w, "directoryListing.tpl", data)
+		if err != nil {
+			fmt.Println(err)
+		}
 	}
 }
 

@@ -27,6 +27,7 @@ var Certificate *string
 var IP *string
 var SearchAndReplaceMap = make(map[string]string)
 var Oneliners *bool
+var DisableDirectoryListing *bool
 
 // Run subcommand
 var List *bool
@@ -61,6 +62,7 @@ func ParseArgs() {
 	searchAndReplaceMap := WebCommand.String("s", "", "Search and replace string in embedded text files")
 	Oneliners = WebCommand.Bool("i", false, "Interactive oneliner")
 	helpWeb := WebCommand.Bool("help", false, "Print usage")
+	DisableDirectoryListing = WebCommand.Bool("disable-listing", false, "Disable directory listing")
 
 	// Command line parsing for subcommand run
 	List = RunCommand.Bool("list", false, "List the embedded files")

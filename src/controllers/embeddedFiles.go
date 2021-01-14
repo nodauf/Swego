@@ -189,49 +189,24 @@ func listEmbeddedFiles() ([]string, []string) {
 }
 
 func handleEmbeddedDirectory(path string, w http.ResponseWriter, req *http.Request) {
-	//        names, _ := f.Readdir(-1)
-	//
-	//        // First, check if there is any index in this folder.
-	//        for _, val := range names {
-	//                if val.Name() == "index.html" {
-	//                        serveFile(path.Join(f.Name(), "index.html"), w, req)
-	//                        return
-	//                }
-	//        }
-	//
-	//        // Otherwise, generate folder content.
-	//        children_dir_tmp := list.New()
-	//        children_files_tmp := list.New()
-	//
-	//        for _, val := range names {
-	//                if val.Name()[0] == '.' {
-	//                        continue
-	//                } // Remove hidden files from listing
-	//
-	//                if val.IsDir() {
-	//                        // There is an issue. There shoudln't be a folder here
-	//                        children_dir_tmp.PushBack(val.Name())
-	//                } else {
-	//                        children_files_tmp.PushBack(val.Name())
-	//                }
-	//        }
-	//
-	children_dir, children_files := listEmbeddedFiles()
+	if !*DisableDirectoryListing {
+		children_dir, children_files := listEmbeddedFiles()
 
-	//Sort children_dir and children_files
-	sort.Slice(children_dir, func(i, j int) bool { return children_dir[i] < children_dir[j] })
+		//Sort children_dir and children_files
+		sort.Slice(children_dir, func(i, j int) bool { return children_dir[i] < children_dir[j] })
 
-	//Sort children_dir and children_files
-	sort.Slice(children_files, func(i, j int) bool { return children_files[i] < children_files[j] })
+		//Sort children_dir and children_files
+		sort.Slice(children_files, func(i, j int) bool { return children_files[i] < children_files[j] })
 
-	data := utils.Dirlisting{Name: req.URL.Path,
-		ServerUA:       serverUA,
-		Children_dir:   children_dir,
-		Children_files: children_files,
-		Embedded:       true}
-	err := renderTemplate(w, "directoryListing.tpl", data)
-	if err != nil {
-		fmt.Println(err)
+		data := utils.Dirlisting{Name: req.URL.Path,
+			ServerUA:       serverUA,
+			Children_dir:   children_dir,
+			Children_files: children_files,
+			Embedded:       true}
+		err := renderTemplate(w, "directoryListing.tpl", data)
+		if err != nil {
+			fmt.Println(err)
+		}
 	}
 }
 
