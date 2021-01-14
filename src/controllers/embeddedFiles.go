@@ -169,7 +169,10 @@ func listEmbeddedFiles() ([]string, []string) {
 	children_dir_tmp := list.New()
 	children_files_tmp := list.New()
 	err = templateBox.Walk("/", func(path string, info os.FileInfo, err error) error {
-		//fmt.Println(path)
+		// don't add the root directory of embbedded files
+		if info.IsDir() && info.Name() == "embedded" {
+			return nil
+		}
 		if info.IsDir() {
 			children_dir_tmp.PushBack(info.Name())
 		} else {
