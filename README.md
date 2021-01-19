@@ -145,7 +145,7 @@ Running binary this way could help bypassing AV protections. Sometimes the argum
 * Create a folder from the browser
 * Ability to execute embedded binary
 * Feature for search and replace (for fill the IP address in reverse shell for example)
-* Generate oneliners to download and execute a file
+* Generate oneliners to download and execute a embedded file
 
 ## Todo
 * JS/CSS menu to give command line in powershell, some lolbins, curl, wget to download and execute 
