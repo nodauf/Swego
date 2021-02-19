@@ -34,6 +34,7 @@ func BasicAuth(h http.HandlerFunc) http.HandlerFunc {
 		}
 		//fmt.Println("Serving: "+ path.Join((*Private), path.Clean(r.URL.Path)))
 		//		h.ServeHTTP(w, r)
-		HandleFile(w, r)
+		//HandleFile(w, r)
+		h(w, r)
 	}
 }
