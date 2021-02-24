@@ -20,30 +20,46 @@ make compileLinux # Or make compileWindows
 ```
 $ ./webserver -help
 web subcommand
-  -bind string
-    	Bind Port (default "8080")
+  -bind int
+        Bind Port (default 8080)
   -certificate string
-    	HTTPS certificate : openssl req -new -x509 -sha256 -key server.key -out server.crt -days 365
+        HTTPS certificate : openssl req -new -x509 -sha256 -key server.key -out server.crt -days 365
+  -disable-listing
+        Disable directory listing
   -gzip
-    	Enables gzip/zlib compression (default true)
+        Enables gzip/zlib compression (default true)
   -help
-    	Print usage
+        Print usage
+  -i    Interactive oneliner
+  -ip string
+        IP to bind (default "0.0.0.0")
   -key string
-    	HTTPS Key : openssl genrsa -out server.key 2048
+        HTTPS Key : openssl genrsa -out server.key 2048
   -password string
-    	Password for basic auth, default: notsecure (default "notsecure")
+        Password for basic auth, default: notsecure (default "notsecure")
   -private string
-    	Private folder with basic auth, default /tmp/SimpleHTTPServer-golang/src/bin/private (default "private")
+        Private folder with basic auth, default /home/florian/dev/SimpleHTTPServer-golang/src/private (default "private")
+  -prompt-password
+        Password for basic auth, will show a prompt default: false
   -root string
-    	Root folder (default "/tmp/SimpleHTTPServer-golang/src/bin")
+        Root folder (default "/home/florian/dev/SimpleHTTPServer-golang/src")
+  -s string
+        Search and replace string in embedded text files
   -tls
-    	Enables HTTPS
+        Enables HTTPS
   -username string
-    	Username for basic auth, default: admin (default "admin")
+        Username for basic auth, default: admin (default "admin")
 
 run subcommand
-Usage:
-./webserver-linux-amd64 run <binary> <args>
+  -args string
+        Arguments for the binary
+  -binary string
+        Binary to execute
+  -help
+        Print usage
+  -list
+        List the embedded files
+
 
 Packaged Binaries:
 ```
