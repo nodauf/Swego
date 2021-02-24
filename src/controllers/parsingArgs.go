@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"SimpleHTTPServer-golang/src/utils"
+	"bufio"
 	"flag"
 	"fmt"
 	"os"
@@ -19,6 +20,7 @@ var Bind *int
 var Root_folder *string
 var Username *string
 var Password *string
+var PromptPassword *bool
 var Uses_gzip *bool
 var Private *string
 var Tls *bool
@@ -54,6 +56,7 @@ func ParseArgs() {
 	Private = WebCommand.String("private", "private", "Private folder with basic auth, default "+cwd+"/private")
 	Username = WebCommand.String("username", "admin", "Username for basic auth, default: admin")
 	Password = WebCommand.String("password", "notsecure", "Password for basic auth, default: notsecure")
+	PromptPassword = WebCommand.Bool("prompt-password", false, "Password for basic auth, will show a prompt default: false")
 	Uses_gzip = WebCommand.Bool("gzip", true, "Enables gzip/zlib compression")
 	Tls = WebCommand.Bool("tls", false, "Enables HTTPS")
 	Key = WebCommand.String("key", "", "HTTPS Key : openssl genrsa -out server.key 2048")
@@ -98,6 +101,12 @@ func ParseArgs() {
 		os.Exit(1)
 	}
 	if WebCommand.Parsed() {
+		if *PromptPassword {
+			reader := bufio.NewReader(os.Stdin)
+			fmt.Print("Enter password: ")
+			text, _ := reader.ReadString('\n')
+			*Password = strings.TrimSpace(text)
+		}
 		if *Root_folder != "" {
 			// Remove if the last character is /
 			if strings.HasSuffix(*Root_folder, "/") {
