@@ -1,8 +1,3 @@
-/* Tiny web server in Golang for sharing a folder
-Copyright (c) 2010-2014 Alexis ROBERT <alexis.robert@gmail.com>
-Contains some code from Golang's http.ServeFile method, and
-uses lighttpd's directory listing HTML template. */
-
 package main
 
 import (
