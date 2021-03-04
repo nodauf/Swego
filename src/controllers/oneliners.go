@@ -77,7 +77,7 @@ func CliOnelinersMenu() {
 	template, err := template.New("onelinersTemplate").Funcs(funcMap).Parse(templateOneliners)
 
 	utils.Check(err, "oneliners: Error while using text/template")
-	// Execute the template with the choosen file
+	// Execute the template with the chosen file
 	template.Execute(os.Stdout, File{Name: sliceFiles[i].Name, Path: sliceFiles[i].Path})
 }
 
