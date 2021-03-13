@@ -6,8 +6,8 @@ import (
 	"net/http"
 	"strconv"
 
-	"SimpleHTTPServer-golang/src/controllers"
-	"SimpleHTTPServer-golang/src/routers"
+	"Swego/src/controllers"
+	"Swego/src/routers"
 )
 
 func main() {

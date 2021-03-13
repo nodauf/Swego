@@ -1,7 +1,7 @@
 package controllers
 
 import (
-	"SimpleHTTPServer-golang/src/utils"
+	"Swego/src/utils"
 	"compress/gzip"
 	"compress/zlib"
 	"container/list"

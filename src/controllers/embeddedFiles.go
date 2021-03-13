@@ -14,7 +14,7 @@ import (
 	"strconv"
 	"strings"
 
-	"SimpleHTTPServer-golang/src/utils"
+	"Swego/src/utils"
 
 	rice "github.com/GeertJohan/go.rice"
 	"github.com/gabriel-vasile/mimetype"

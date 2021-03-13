@@ -3,7 +3,7 @@ package routers
 import (
     "net/http"
     "net/url"
-    "SimpleHTTPServer-golang/src/controllers"
+    "Swego/src/controllers"
 )
 
 func ParseHttpParameter(w http.ResponseWriter, req *http.Request){

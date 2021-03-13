@@ -1,7 +1,7 @@
 package routers
 
 import (
-	"SimpleHTTPServer-golang/src/controllers"
+	"Swego/src/controllers"
 	"fmt"
 	"net/http"
 )
