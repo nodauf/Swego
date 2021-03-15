@@ -14,6 +14,7 @@ import (
 	"strconv"
 	"strings"
 
+	"Swego/src/cmd"
 	"Swego/src/utils"
 
 	rice "github.com/GeertJohan/go.rice"
@@ -113,7 +114,7 @@ func serveEmbeddedFile(filePath string, w http.ResponseWriter, req *http.Request
 
 	is_compressed_reply := false
 
-	if (*Uses_gzip) == true && req.Header.Get("Accept-Encoding") != "" {
+	if (cmd.Gzip) == true && req.Header.Get("Accept-Encoding") != "" {
 		encodings := utils.ParseCSV(req.Header.Get("Accept-Encoding"))
 
 		for _, val := range encodings {
@@ -146,7 +147,7 @@ func serveEmbeddedFile(filePath string, w http.ResponseWriter, req *http.Request
 
 	for err == nil {
 		n, err = f.Read(buf)
-		buf = utils.SearchAndReplace(SearchAndReplaceMap, buf)
+		buf = utils.SearchAndReplace(cmd.SearchAndReplaceMap, buf)
 		output_writer.Write(buf[0:n])
 	}
 	// Closes current compressors
@@ -192,7 +193,7 @@ func listEmbeddedFiles() ([]string, []string) {
 }
 
 func handleEmbeddedDirectory(path string, w http.ResponseWriter, req *http.Request) {
-	if !*DisableDirectoryListing {
+	if !cmd.DisableListing {
 		children_dir, children_files := listEmbeddedFiles()
 
 		//Sort children_dir and children_files

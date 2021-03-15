@@ -7,6 +7,7 @@ import (
 	"strconv"
 	"strings"
 
+	"Swego/src/cmd"
 	"Swego/src/utils"
 
 	rice "github.com/GeertJohan/go.rice"
@@ -83,9 +84,9 @@ func CliOnelinersMenu() {
 
 func searchAndReaplceOneliners(template string) string {
 	// Replace IP and Port by the IP, port, ... put in arguments
-	template = strings.ReplaceAll(template, "[IP]", *IP)
-	template = strings.ReplaceAll(template, "[PORT]", strconv.Itoa(*Bind))
-	if *Tls {
+	template = strings.ReplaceAll(template, "[IP]", cmd.IP)
+	template = strings.ReplaceAll(template, "[PORT]", strconv.Itoa(cmd.Bind))
+	if cmd.TLS {
 		template = strings.ReplaceAll(template, "[PROTO]", "https")
 	} else {
 		template = strings.ReplaceAll(template, "[PROTO]", "http")

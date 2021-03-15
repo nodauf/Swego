@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"Swego/src/cmd"
 	"Swego/src/utils"
 	"compress/gzip"
 	"compress/zlib"
@@ -29,10 +30,10 @@ const fs_maxbufsize = 4096 // 4096 bits = default page size on OSX
 func HandleFile(w http.ResponseWriter, req *http.Request) {
 	w.Header().Set("Server", serverUA)
 
-	filepath := path.Join((*Root_folder), path.Clean(req.URL.Path))
+	filepath := path.Join((cmd.RootFolder), path.Clean(req.URL.Path))
 	if strings.Contains(req.URL.Path, "/private/") {
 		req.URL.Path = strings.Replace(req.URL.Path, "/private/", "", 1)
-		filepath = path.Join((*Private), path.Clean(req.URL.Path))
+		filepath = path.Join((cmd.PrivateFolder), path.Clean(req.URL.Path))
 	}
 	serveFile(filepath, w, req)
 
@@ -172,7 +173,7 @@ func serveFile(filePath string, w http.ResponseWriter, req *http.Request) {
 
 	is_compressed_reply := false
 
-	if (*Uses_gzip) == true && req.Header.Get("Accept-Encoding") != "" {
+	if (cmd.Gzip) == true && req.Header.Get("Accept-Encoding") != "" {
 		encodings := utils.ParseCSV(req.Header.Get("Accept-Encoding"))
 
 		for _, val := range encodings {
@@ -204,7 +205,7 @@ func serveFile(filePath string, w http.ResponseWriter, req *http.Request) {
 	n := 0
 	for err == nil {
 		n, err = f.Read(buf)
-		buf = utils.SearchAndReplace(SearchAndReplaceMap, buf)
+		buf = utils.SearchAndReplace(cmd.SearchAndReplaceMap, buf)
 		output_writer.Write(buf[0:n])
 	}
 
@@ -220,7 +221,7 @@ func serveFile(filePath string, w http.ResponseWriter, req *http.Request) {
 }
 
 func handleDirectory(f *os.File, w http.ResponseWriter, req *http.Request) {
-	if !*DisableDirectoryListing {
+	if !cmd.DisableListing {
 		names, _ := f.Readdir(-1)
 
 		// First, check if there is any index in this folder.

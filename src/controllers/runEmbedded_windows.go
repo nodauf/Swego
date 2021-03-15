@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"bytes"
-	"fmt"
 	"syscall"
 	"time"
 	"unsafe"
@@ -17,11 +16,13 @@ func checkFatalErr(err error) {
 	}
 }
 
-func PrintEmbeddedFiles() {
-	_, children_files := listEmbeddedFiles()
-	for _, value := range children_files {
-		fmt.Println(value)
+func EmbeddedFiles() string {
+	returnValue := ""
+	_, childrenFiles := listEmbeddedFiles()
+	for _, value := range childrenFiles {
+		returnValue += value + "\n"
 	}
+	return returnValue
 }
 
 func RunEmbeddedBinary(binary string, arguments string) {

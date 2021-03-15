@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"Swego/src/cmd"
 	"fmt"
 	"io"
 	"net/http"
@@ -10,10 +11,10 @@ import (
 )
 
 func UploadFile(w http.ResponseWriter, r *http.Request) {
-	filepath := path.Join((*Root_folder), path.Clean(r.URL.Path))
+	filepath := path.Join((cmd.RootFolder), path.Clean(r.URL.Path))
 	if strings.Contains(r.URL.Path, "/private/") {
 		r.URL.Path = strings.Replace(r.URL.Path, "/private/", "", 1)
-		filepath = path.Join((*Private), path.Clean(r.URL.Path))
+		filepath = path.Join((cmd.PrivateFolder), path.Clean(r.URL.Path))
 	}
 	fmt.Println(r.URL.Path)
 	// Maximum upload of 1000 MB files

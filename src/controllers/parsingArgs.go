@@ -1,42 +1,31 @@
 package controllers
 
-import (
-	"Swego/src/utils"
-	"bufio"
-	"flag"
-	"fmt"
-	"os"
-	"path"
-	"runtime"
-	"strings"
-)
-
 // Subcommand
-var WebCommand *flag.FlagSet
-var RunCommand *flag.FlagSet
+//var WebCommand *flag.FlagSet
+//var RunCommand *flag.FlagSet
 
 // Web subcommand
-var Bind *int
-var Root_folder *string
-var Username *string
-var Password *string
-var PromptPassword *bool
-var Uses_gzip *bool
-var Private *string
-var Tls *bool
-var Key *string
-var Certificate *string
-var IP *string
-var SearchAndReplaceMap = make(map[string]string)
-var Oneliners *bool
-var DisableDirectoryListing *bool
+// var Bind *int
+// var Root_folder *string
+// var Username *string
+// var Password *string
+// var PromptPassword *bool
+// var Uses_gzip *bool
+// var Private *string
+// var Tls *bool
+// var Key *string
+// var Certificate *string
+// var IP *string
+
+// var Oneliners *bool
+// var DisableDirectoryListing *bool
 
 // Run subcommand
-var List *bool
-var Binary *string
-var Args *string
+//var List *bool
+//var Binary *string
+//var Args *string
 
-func ParseArgs() {
+/* func ParseArgs() {
 
 	//help := flag.Bool("help",false,"Print usage")
 	//flag.Parse()
@@ -150,7 +139,7 @@ func ParseArgs() {
 			fmt.Println("You must specify a binary to run")
 			RunCommand.PrintDefaults()
 			fmt.Println("\nPackaged Binaries:")
-			PrintEmbeddedFiles()
+			//PrintEmbeddedFiles()
 			os.Exit(1)
 		}
 		//        // If list and binary
@@ -158,13 +147,13 @@ func ParseArgs() {
 			fmt.Println("You must specify either binary or list")
 			RunCommand.PrintDefaults()
 			fmt.Println("\nPackaged Binaries:")
-			PrintEmbeddedFiles()
+			//PrintEmbeddedFiles()
 			os.Exit(1)
 		}
 		if *helpRun {
 			RunCommand.PrintDefaults()
 			fmt.Println("\nPackaged Binaries:")
-			PrintEmbeddedFiles()
+			//PrintEmbeddedFiles()
 			os.Exit(1)
 		}
 	}
@@ -173,7 +162,7 @@ func ParseArgs() {
 func showUsageRun() {
 	fmt.Printf("Usage:\n%s run <binary> \"<args>\"\n", os.Args[0])
 	fmt.Println("\nPackaged Binaries:")
-	PrintEmbeddedFiles()
+	//PrintEmbeddedFiles()
 }
 
 func showUsage() {
@@ -182,5 +171,5 @@ func showUsage() {
 	fmt.Println("\nrun subcommand")
 	RunCommand.PrintDefaults()
 	fmt.Println("\nPackaged Binaries:")
-	PrintEmbeddedFiles()
-}
+	//PrintEmbeddedFiles()
+} */

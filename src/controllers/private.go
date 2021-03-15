@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"Swego/src/cmd"
 	"encoding/base64"
 	"net/http"
 	"strings"
@@ -28,7 +29,7 @@ func BasicAuth(h http.HandlerFunc) http.HandlerFunc {
 			return
 		}
 
-		if pair[0] != *Username || pair[1] != *Password {
+		if pair[0] != cmd.Username || pair[1] != cmd.Password {
 			http.Error(w, "Not authorized", 401)
 			return
 		}

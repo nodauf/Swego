@@ -1,20 +1,15 @@
 package controllers
 
-import (
-    "fmt"
-
-)
-
-
-func PrintEmbeddedFiles(){
-    _, children_files := listEmbeddedFiles()
-    for _, value := range children_files{
-        fmt.Println(value)
-    }
+func EmbeddedFiles() string {
+	returnValue := ""
+	_, childrenFiles := listEmbeddedFiles()
+	for _, value := range childrenFiles {
+		returnValue += value + "\n"
+	}
+	return returnValue
 }
 
 // To avoid generating error on Linux
-func RunEmbeddedBinary(binary string, arguments string){
+func RunEmbeddedBinary(binary string, arguments string) {
 
 }
-
