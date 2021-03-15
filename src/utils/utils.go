@@ -16,31 +16,16 @@ import (
 	"github.com/yeka/zip"
 )
 
-const fs_maxbufsize = 4096
-
-type Params struct {
-	Name           string
-	Children_dir   []string
-	Children_files []string
-	Messages       string
-}
-
-// Manages directory listings
+// Dirlisting to manages directory listings
 type Dirlisting struct {
-	Name           string
-	Children_dir   []string
-	Children_files []string
-	ServerUA       string
-	Embedded       bool
+	Name          string
+	ChildrenDir   []string
+	ChildrenFiles []string
+	ServerUA      string
+	Embedded      bool
 }
 
-func TrimSuffix(s, suffix string) string {
-	if strings.HasSuffix(s, suffix) {
-		s = s[:len(s)-len(suffix)]
-	}
-	return s
-}
-
+// CopyToArray convert a list to a string
 func CopyToArray(src *list.List) []string {
 	dst := make([]string, src.Len())
 
@@ -53,6 +38,7 @@ func CopyToArray(src *list.List) []string {
 	return dst
 }
 
+// Min returns the minimum between two integer
 func Min(x int64, y int64) int64 {
 	if x < y {
 		return x
@@ -60,23 +46,24 @@ func Min(x int64, y int64) int64 {
 	return y
 }
 
+// ParseCSV format. Use to parse the header Encoding
 func ParseCSV(data string) []string {
 	splitted := strings.SplitN(data, ",", -1)
 
-	data_tmp := make([]string, len(splitted))
+	dataTmp := make([]string, len(splitted))
 
 	for i, val := range splitted {
-		data_tmp[i] = strings.TrimSpace(val)
+		dataTmp[i] = strings.TrimSpace(val)
 	}
 
-	return data_tmp
+	return dataTmp
 }
 
 func ParseRange(data string) int64 {
 	stop := (int64)(0)
 	part := 0
 	for i := 0; i < len(data) && part < 2; i = i + 1 {
-		if part == 0 { // part = 0 <=> equal isn't met.
+		if part == 0 {
 			if data[i] == '=' {
 				part = 1
 			}
@@ -84,15 +71,15 @@ func ParseRange(data string) int64 {
 			continue
 		}
 
-		if part == 1 { // part = 1 <=> we've met the equal, parse beginning
+		if part == 1 {
 			if data[i] == ',' || data[i] == '-' {
-				part = 2 // part = 2 <=> OK DUDE.
+				part = 2
 			} else {
-				if 48 <= data[i] && data[i] <= 57 { // If it's a digit ...
+				if 48 <= data[i] && data[i] <= 57 {
 					// ... convert the char to integer and add it!
 					stop = (stop * 10) + (((int64)(data[i])) - 48)
 				} else {
-					part = 2 // Parsing error! No error needed : 0 = from start.
+					part = 2
 				}
 			}
 		}
@@ -101,7 +88,7 @@ func ParseRange(data string) int64 {
 	return stop
 }
 
-//func AddfiletoEncryptedZip(path string, f *os.File, zipw *zip.Writer, password string) {
+//AddfiletoZip will add a file to a zip file
 func AddfiletoZip(path string, f *os.File, zipw *zip.Writer, encrypted bool, password string) {
 	filePathName := f.Name()
 
@@ -129,6 +116,7 @@ func AddfiletoZip(path string, f *os.File, zipw *zip.Writer, encrypted bool, pas
 	return
 }
 
+// AddRicefiletoZip add a embedded file (rice file) to a zip
 func AddRicefiletoZip(path string, f *rice.File, filePathName string, zipw *zip.Writer, encrypted bool, password string) {
 	//        body, err := ioutil.ReadFile(filePathName)
 	statInfo, err := f.Stat()
@@ -168,7 +156,7 @@ func AddRicefiletoZip(path string, f *rice.File, filePathName string, zipw *zip.
 	return
 }
 
-// fileExists checks if a file exists and is not a directory before we
+// FileExists checks if a file exists and is not a directory before we
 // try using it to prevent further errors.
 func FileExists(filename string) bool {
 	info, err := os.Stat(filename)
@@ -178,6 +166,7 @@ func FileExists(filename string) bool {
 	return !info.IsDir()
 }
 
+// ZipDirectory will create a zip file from a directory
 func ZipDirectory(f *os.File, encrypted bool) string {
 	// Absolute path to the directory
 	directoryPathName := f.Name()
@@ -230,6 +219,7 @@ func ZipDirectory(f *os.File, encrypted bool) string {
 	return zipFilePath
 }
 
+// SearchAndReplace function in the byte slice
 func SearchAndReplace(SearchAndReplaceMap map[string]string, buf []byte) []byte {
 	if len(SearchAndReplaceMap) > 0 {
 		for searchAndReplaceOld, searchAndReplaceNew := range SearchAndReplaceMap {
@@ -239,6 +229,7 @@ func SearchAndReplace(SearchAndReplaceMap map[string]string, buf []byte) []byte 
 	return buf
 }
 
+// Check if there is an error
 func Check(e error, customMessage string) {
 	if e != nil {
 		fmt.Println(customMessage)

@@ -13,20 +13,48 @@ import (
 	"golang.org/x/crypto/ssh/terminal"
 )
 
+// Arguments
+
+// Web : bool to know if it's the web subcommand
 var Web bool
 
+// Bind Port
 var Bind int
+
+// IP where the webserver will listen
 var IP string
+
+// TLS : bool if TLS is enabled or not
 var TLS bool
+
+// TLSCertificate is the tls certificate
 var TLSCertificate string
+
+// TLSKey is the tls key
 var TLSKey string
+
+// DisableListing : option to disable directory listing
 var DisableListing bool
+
+// Gzip enable gzip compression
 var Gzip bool
+
+// Oneliners : boolean to enable generation of oneliners to download and execute files
 var Oneliners bool
+
+// Username for the private folder
 var Username string
+
+// Password for the private folder
 var Password string
+
+// PrivateFolder is the path for the private folder
 var PrivateFolder string
+
+// RootFolder is the path for the root folder
 var RootFolder string
+
+// SearchAndReplaceMap is the map which contains the information to search and replace string by another
 var SearchAndReplaceMap = make(map[string]string)
 
 var promptPassword bool
@@ -37,12 +65,7 @@ var searchAndReplace string
 var webCmd = &cobra.Command{
 	Use:   "web",
 	Short: "Start the webserver (default subcommand)",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+	Long:  `Start the webserver (default subcommand)`,
 	PreRunE: func(cmd *cobra.Command, args []string) error {
 		if (TLS || TLSKey != "" || TLSCertificate != "") && (!TLS || TLSKey == "" || TLSCertificate == "") {
 			return errors.New("Tls, certificate and/or key arguments missing")
@@ -59,10 +82,8 @@ to quickly create a Cobra application.`,
 			fmt.Print("Enter password: ")
 			bytePassword, err := terminal.ReadPassword(int(syscall.Stdin))
 			fmt.Print("\n")
-			if err != nil {
-				fmt.Println(err)
-				os.Exit(1)
-			}
+			utils.Check(err, "Error when reading password")
+
 			//text, _ := reader.ReadString('\n')
 			Password = strings.TrimSpace(string(bytePassword))
 		}
@@ -70,7 +91,7 @@ to quickly create a Cobra application.`,
 		// For RootFolder
 		// Remove if the last character is /
 		if strings.HasSuffix(RootFolder, "/") {
-			RootFolder = utils.TrimSuffix(RootFolder, "/")
+			RootFolder = strings.TrimSuffix(RootFolder, "/")
 		}
 		// If relative path
 		if !strings.HasPrefix(RootFolder, "/") {
@@ -80,7 +101,7 @@ to quickly create a Cobra application.`,
 		// For PrivateFolder
 		// Remove if the last character is /
 		if strings.HasSuffix(PrivateFolder, "/") {
-			PrivateFolder = utils.TrimSuffix(PrivateFolder, "/")
+			PrivateFolder = strings.TrimSuffix(PrivateFolder, "/")
 		}
 		// If relative path
 		if !strings.HasPrefix(PrivateFolder, "/") {

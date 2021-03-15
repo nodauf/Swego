@@ -14,12 +14,13 @@ import (
 	"github.com/manifoldco/promptui"
 )
 
+// File struct which contains its name and path
 type File struct {
 	Name string
 	Path string
 }
 
-// CLI
+// CliOnelinersMenu is the menu which will print the oneliner string
 func CliOnelinersMenu() {
 	sliceFiles := []File{}
 	templateBox, err := rice.FindBox("../views/")

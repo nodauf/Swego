@@ -1,5 +1,6 @@
 package controllers
 
+// EmbeddedFiles list the embedded files
 func EmbeddedFiles() string {
 	returnValue := ""
 	_, childrenFiles := listEmbeddedFiles()
@@ -9,7 +10,7 @@ func EmbeddedFiles() string {
 	return returnValue
 }
 
-// To avoid generating error on Linux
+// RunEmbeddedBinary Do nothng, only to avoid generating error on Linux
 func RunEmbeddedBinary(binary string, arguments string) {
 
 }

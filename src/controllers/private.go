@@ -7,6 +7,7 @@ import (
 	"strings"
 )
 
+// BasicAuth function to handle private directory and print basic authentication
 func BasicAuth(h http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("WWW-Authenticate", `Basic realm="Restricted"`)

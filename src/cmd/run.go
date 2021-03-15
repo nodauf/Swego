@@ -6,22 +6,25 @@ import (
 	"github.com/spf13/cobra"
 )
 
+// Arguments
+
+// Run : bool to know if it's the run subcommand
 var Run bool
 
+// Args for the binary to run
 var Args string
+
+// Binary to run
 var Binary string
+
+// List : Action to list the embedded binaries
 var List bool
 
 // runCmd represents the run command
 var runCmd = &cobra.Command{
 	Use:   "run",
-	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+	Short: "Run an embedded binary",
+	Long:  `Run an embedded binary`,
 	PreRunE: func(cmd *cobra.Command, args []string) error {
 		if !List && Binary == "" {
 			return errors.New("You must specify a binary to run")

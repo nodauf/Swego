@@ -10,6 +10,7 @@ import (
 	"strings"
 )
 
+// UploadFile will receive and create the uploaded file
 func UploadFile(w http.ResponseWriter, r *http.Request) {
 	filepath := path.Join((cmd.RootFolder), path.Clean(r.URL.Path))
 	if strings.Contains(r.URL.Path, "/private/") {

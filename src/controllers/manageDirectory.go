@@ -10,6 +10,7 @@ import (
 	"strings"
 )
 
+// CreateFolder will create a folder from the web request
 func CreateFolder(w http.ResponseWriter, req *http.Request) {
 	dirPath := path.Join((cmd.RootFolder), path.Clean(req.URL.Path))
 	query, errParseQuery := url.ParseQuery(req.URL.RawQuery)

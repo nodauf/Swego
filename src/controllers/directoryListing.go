@@ -25,8 +25,9 @@ import (
 )
 
 const serverUA = ""
-const fs_maxbufsize = 4096 // 4096 bits = default page size on OSX
+const fsMaxbufsize = 4096 // 4096 bits = default page size on OSX
 
+// HandleFile is the entrypoint to manage the web request
 func HandleFile(w http.ResponseWriter, req *http.Request) {
 	w.Header().Set("Server", serverUA)
 
@@ -156,22 +157,22 @@ func serveFile(filePath string, w http.ResponseWriter, req *http.Request) {
 	w.Header().Set("Cache-Control", "store, public, min-age=5, max-age=120")
 	// Manage Content-Range (TODO: Manage end byte and multiple Content-Range)
 	if req.Header.Get("Range") != "" {
-		start_byte := utils.ParseRange(req.Header.Get("Range"))
+		startByte := utils.ParseRange(req.Header.Get("Range"))
 
-		if start_byte < statinfo.Size() {
-			f.Seek(start_byte, 0)
+		if startByte < statinfo.Size() {
+			f.Seek(startByte, 0)
 		} else {
-			start_byte = 0
+			startByte = 0
 		}
 
 		w.Header().Set("Content-Range",
-			fmt.Sprintf("bytes %d-%d/%d", start_byte, statinfo.Size()-1, statinfo.Size()))
+			fmt.Sprintf("bytes %d-%d/%d", startByte, statinfo.Size()-1, statinfo.Size()))
 	}
 
 	// Manage gzip/zlib compression
-	output_writer := w.(io.Writer)
+	outputWriter := w.(io.Writer)
 
-	is_compressed_reply := false
+	isCompressedReply := false
 
 	if (cmd.Gzip) == true && req.Header.Get("Accept-Encoding") != "" {
 		encodings := utils.ParseCSV(req.Header.Get("Accept-Encoding"))
@@ -179,42 +180,42 @@ func serveFile(filePath string, w http.ResponseWriter, req *http.Request) {
 		for _, val := range encodings {
 			if val == "gzip" {
 				w.Header().Set("Content-Encoding", "gzip")
-				output_writer = gzip.NewWriter(w)
+				outputWriter = gzip.NewWriter(w)
 
-				is_compressed_reply = true
+				isCompressedReply = true
 
 				break
 			} else if val == "deflate" {
 				w.Header().Set("Content-Encoding", "deflate")
-				output_writer = zlib.NewWriter(w)
+				outputWriter = zlib.NewWriter(w)
 
-				is_compressed_reply = true
+				isCompressedReply = true
 
 				break
 			}
 		}
 	}
 
-	if !is_compressed_reply {
+	if !isCompressedReply {
 		// Add Content-Length
 		w.Header().Set("Content-Length", strconv.FormatInt(statinfo.Size(), 10))
 	}
 
 	// Stream data out !
-	buf := make([]byte, utils.Min(fs_maxbufsize, statinfo.Size()))
+	buf := make([]byte, utils.Min(fsMaxbufsize, statinfo.Size()))
 	n := 0
 	for err == nil {
 		n, err = f.Read(buf)
 		buf = utils.SearchAndReplace(cmd.SearchAndReplaceMap, buf)
-		output_writer.Write(buf[0:n])
+		outputWriter.Write(buf[0:n])
 	}
 
 	// Closes current compressors
-	switch output_writer.(type) {
+	switch outputWriter.(type) {
 	case *gzip.Writer:
-		output_writer.(*gzip.Writer).Close()
+		outputWriter.(*gzip.Writer).Close()
 	case *zlib.Writer:
-		output_writer.(*zlib.Writer).Close()
+		outputWriter.(*zlib.Writer).Close()
 	}
 
 	//f.Close()
@@ -233,8 +234,8 @@ func handleDirectory(f *os.File, w http.ResponseWriter, req *http.Request) {
 		}
 
 		// Otherwise, generate folder content.
-		children_dir_tmp := list.New()
-		children_files_tmp := list.New()
+		childrenDirTmp := list.New()
+		childrenFilesTmp := list.New()
 
 		for _, val := range names {
 			//if val.Name()[0] == '.' {
@@ -242,23 +243,23 @@ func handleDirectory(f *os.File, w http.ResponseWriter, req *http.Request) {
 			//} // Remove hidden files from listing
 
 			if val.IsDir() {
-				children_dir_tmp.PushBack(val.Name())
+				childrenDirTmp.PushBack(val.Name())
 			} else {
-				children_files_tmp.PushBack(val.Name())
+				childrenFilesTmp.PushBack(val.Name())
 			}
 		}
 
 		// And transfer the content to the final array structure
-		children_dir := utils.CopyToArray(children_dir_tmp)
-		children_files := utils.CopyToArray(children_files_tmp)
+		childrenDir := utils.CopyToArray(childrenDirTmp)
+		childrenFiles := utils.CopyToArray(childrenFilesTmp)
 		//Sort children_dir and children_files
-		sort.Slice(children_dir, func(i, j int) bool { return children_dir[i] < children_dir[j] })
+		sort.Slice(childrenDir, func(i, j int) bool { return childrenDir[i] < childrenDir[j] })
 
 		//Sort children_dir and children_files
-		sort.Slice(children_files, func(i, j int) bool { return children_files[i] < children_files[j] })
+		sort.Slice(childrenFiles, func(i, j int) bool { return childrenFiles[i] < childrenFiles[j] })
 
 		data := utils.Dirlisting{Name: req.URL.Path, ServerUA: serverUA,
-			Children_dir: children_dir, Children_files: children_files}
+			ChildrenDir: childrenDir, ChildrenFiles: childrenFiles}
 		err := renderTemplate(w, "directoryListing.tpl", data)
 		if err != nil {
 			fmt.Println(err)
