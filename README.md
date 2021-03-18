@@ -16,52 +16,55 @@ cd Swego/src
 make compileLinux # Or make compileWindows
 ```
 
-### Help
+### Usage
+
+web subcommand: 
+
 ```
-$ ./webserver -help
-web subcommand
-  -bind int
-        Bind Port (default 8080)
-  -certificate string
-        HTTPS certificate : openssl req -new -x509 -sha256 -key server.key -out server.crt -days 365
-  -disable-listing
-        Disable directory listing
-  -gzip
-        Enables gzip/zlib compression (default true)
-  -help
-        Print usage
-  -i    Interactive oneliner
-  -ip string
-        IP to bind (default "0.0.0.0")
-  -key string
-        HTTPS Key : openssl genrsa -out server.key 2048
-  -password string
-        Password for basic auth, default: notsecure (default "notsecure")
-  -private string
-        Private folder with basic auth, default /home/florian/dev/SimpleHTTPServer-golang/src/private (default "private")
-  -prompt-password
-        Password for basic auth, will show a prompt default: false
-  -root string
-        Root folder (default "/home/florian/dev/SimpleHTTPServer-golang/src")
-  -s string
-        Search and replace string in embedded text files
-  -tls
-        Enables HTTPS
-  -username string
-        Username for basic auth, default: admin (default "admin")
+$ ./webserver web --help
+Start the webserver (default subcommand)
 
-run subcommand
-  -args string
-        Arguments for the binary
-  -binary string
-        Binary to execute
-  -help
-        Print usage
-  -list
-        List the embedded files
+Usage:
+  Swego web [flags]
 
+Flags:
+  -b, --bind int                  Bind Port (default 8080)
+  -c, --certificate string        HTTPS certificate : openssl req -new -x509 -sha256 -key server.key -out server.crt -days 365
+  -d, --disableListing            Disable directory listing
+  -g, --gzip                      Enables gzip/zlib compression (default true)
+      --ip string                 Binding IP (default "0.0.0.0")
+  -k, --key string                HTTPS Key : openssl genrsa -out server.key 2048
+  -o, --oneliners                 Generate oneliners to download files
+  -p, --password string           Password for basic auth (default "notsecure")
+      --private string            Private folder with basic auth (default "/home/florian/dev/SimpleHTTPServer-golang/src/private")
+      --promptPassword            Prompt for for basic auth's password
+  -r, --root string               Root folder (default "/home/florian/dev/SimpleHTTPServer-golang/src")
+  -s, --searchAndReplace string   Search and replace string in embedded text files
+      --tls                       Enables HTTPS
+  -u, --username string           Username for basic auth (default "admin")
 
-Packaged Binaries:
+Global Flags:
+      --config string   config file (default is $HOME/.Swego.yaml)
+  -h, --help            Help message
+```
+
+run subcommand: 
+
+```
+$ ./webserver web --help
+Run an embedded binary
+
+Usage:
+  Swego run [flags]
+
+Flags:
+  -a, --args string     Arguments for the binary
+  -b, --binary string   Binary to execute
+  -l, --list            List embedded binaries
+
+Global Flags:
+      --config string   config file (default is $HOME/.Swego.yaml)
+  -h, --help            Help message
 ```
 
 ### Web server over HTTP
@@ -95,7 +98,7 @@ Organizational Unit Name (eg, section) []:
 Common Name (e.g. server FQDN or YOUR name) []:
 Email Address []:
 
-$ ./webserver web -tls -key server.key -cert server.crt
+$ ./webserver web --tls --key server.key --certificate server.crt
 Sharing /tmp/ on 8080 ...
 Sharing /tmp/private on 8080 ...
 ```
@@ -105,14 +108,14 @@ Sharing /tmp/private on 8080 ...
 #### Private folder on same directory
 
 ```
-$ ./webserver-linux-amd64 web -private ThePrivateFolder -username nodauf -password nodauf
+$ ./webserver-linux-amd64 web --private ThePrivateFolder --username nodauf --password nodauf
 Sharing /tmp/ on 8080 ...
 Sharing /tmp/ThePrivateFolder on 8080 ...
 ```
 
 #### Different path for root and private directory
 ```
-$ ./webserver-linux-amd64 web -private /tmp/private -root /home/nodauf -username nodauf -password nodauf
+$ ./webserver-linux-amd64 web --private /tmp/private --root /home/nodauf --username nodauf --password nodauf
 Sharing /home/nodauf on 8080 ...
 Sharing /tmp/private on 8080 ...
 ```
@@ -123,27 +126,24 @@ Sharing /tmp/private on 8080 ...
 
 ```
 C:\Users\Nodauf>.\webserver.exe run  
-You must specify a binary to run
-  -args string
-        Arguments for the binary
-  -binary string
-        Binary to execute
-  -help
-        Print usage
-  -list
-        List the embedded files
+Usage:
+  Swego run [flags]
 
-Packaged Binaries:
-Invoke-PowerShellTcp.ps1
-mimikatz.exe
-php-reverse-shell.php
-plink.exe
+Flags:
+  -a, --args string     Arguments for the binary
+  -b, --binary string   Binary to execute
+  -l, --list            List embedded binaries
+
+Global Flags:
+      --config string   config file (default is $HOME/.Swego.yaml)
+  -h, --help            Help message
+
 ```
 
 #### Run binary with arguments:
 
 ```
-C:\Users\Nodauf>.\webserver.exe run -binary mimikatz.exe -args "privilege::debug sekurlsa::logonpasswords"
+C:\Users\Nodauf>.\webserver.exe run --binary mimikatz.exe --args "privilege::debug sekurlsa::logonpasswords"
 ....
 ```
 Running binary this way could help bypassing AV protections. Sometimes the arguments sent to the binary may be catch by the AV, if possible use the interactive CLI of the binary (like mimikatz) or recompile the binary to change the arguments name.
@@ -162,11 +162,10 @@ Running binary this way could help bypassing AV protections. Sometimes the argum
 * Ability to execute embedded binary
 * Feature for search and replace (for fill the IP address in reverse shell for example)
 * Generate oneliners to download and execute a embedded file
+* Config file [examples .Swego.yaml](./Swego.yaml)
 
 ## Todo
 * Log file
-* Prompt for password instead using cli
-* JS/CSS menu to give command line in powershell, some lolbins, curl, wget to download and execute 
-* Config file for the search and replace (Useful for default config) and other features
+* JS/CSS menu to give command line in powershell, some lolbins, curl, wget to download and execute
 * Use regex for search and replace
 * Using virtual file system to manage embedded files
