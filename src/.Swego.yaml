@@ -1,4 +1,5 @@
 # Case insensitive
+# Web subcommand
 bind: 8080
 IP: 0.0.0.0
 TLS: false
@@ -13,3 +14,8 @@ root: /tmp
 private: /root
 promptPassword: false
 searchAndReplace: ""
+
+# Run subcommand
+List: false
+binary: ""
+args: ""
