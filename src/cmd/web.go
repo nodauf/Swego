@@ -10,6 +10,7 @@ import (
 	"syscall"
 
 	"github.com/spf13/cobra"
+	viper "github.com/spf13/viper"
 	"golang.org/x/crypto/ssh/terminal"
 )
 
@@ -67,6 +68,22 @@ var webCmd = &cobra.Command{
 	Short: "Start the webserver (default subcommand)",
 	Long:  `Start the webserver (default subcommand)`,
 	PreRunE: func(cmd *cobra.Command, args []string) error {
+		// Map the variable in the config file
+		Bind = viper.GetInt("bind")
+		IP = viper.GetString("IP")
+		TLS = viper.GetBool("TLS")
+		TLSCertificate = viper.GetString("TLSCertificate")
+		TLSKey = viper.GetString("TLSKey")
+		DisableListing = viper.GetBool("DisableListing")
+		Gzip = viper.GetBool("Gzip")
+		Oneliners = viper.GetBool("Oneliners")
+		Username = viper.GetString("Username")
+		Password = viper.GetString("Password")
+		RootFolder = viper.GetString("Root")
+		PrivateFolder = viper.GetString("Private")
+
+		promptPassword = viper.GetBool("promptPassword")
+		searchAndReplace = viper.GetString("searchAndReplace")
 		if (TLS || TLSKey != "" || TLSCertificate != "") && (!TLS || TLSKey == "" || TLSCertificate == "") {
 			return errors.New("Tls, certificate and/or key arguments missing")
 
@@ -74,9 +91,11 @@ var webCmd = &cobra.Command{
 			return errors.New("Certificate file " + TLSCertificate + " or key file " + TLSKey + " not found")
 
 		}
+
 		return nil
 	},
 	Run: func(cmd *cobra.Command, args []string) {
+
 		if promptPassword {
 			//reader := bufio.NewReader(os.Stdin)
 			fmt.Print("Enter password: ")

@@ -69,5 +69,11 @@ func initConfig() {
 	// If a config file is found, read it in.
 	if err := viper.ReadInConfig(); err == nil {
 		fmt.Println("Using config file:", viper.ConfigFileUsed())
+	} else {
+		fmt.Println(err)
 	}
+
+	// Bind the webcmd flags to the config file
+	viper.BindPFlags(webCmd.Flags())
+	viper.BindPFlags(runCmd.Flags())
 }

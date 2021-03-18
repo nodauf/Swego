@@ -4,6 +4,7 @@ import (
 	"errors"
 
 	"github.com/spf13/cobra"
+	viper "github.com/spf13/viper"
 )
 
 // Arguments
@@ -26,6 +27,9 @@ var runCmd = &cobra.Command{
 	Short: "Run an embedded binary",
 	Long:  `Run an embedded binary`,
 	PreRunE: func(cmd *cobra.Command, args []string) error {
+		Args = viper.GetString("Args")
+		Binary = viper.GetString("Binary")
+		List = viper.GetBool("List")
 		if !List && Binary == "" {
 			return errors.New("You must specify a binary to run")
 
@@ -45,4 +49,7 @@ func init() {
 	runCmd.Flags().StringVarP(&Args, "args", "a", "", "Arguments for the binary")
 	runCmd.Flags().StringVarP(&Binary, "binary", "b", "", "Binary to execute")
 	runCmd.Flags().BoolVarP(&List, "list", "l", false, "List embedded binaries")
+
+	viper.BindPFlags(runCmd.Flags())
+
 }
