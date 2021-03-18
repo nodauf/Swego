@@ -13,6 +13,8 @@ cloud.google.com/go/storage v1.0.0/go.mod h1:IhtSnM/ZTZV8YYJWCY8RULGVqBDmpoyjwiy
 dmitri.shuralyov.com/gpu/mtl v0.0.0-20190408044501-666a987793e9/go.mod h1:H6x//7gZCb22OMCxBHrMx7a5I7Hp++hsVxbQ4BYO7hU=
 github.com/Binject/debug v0.0.0-20200830173345-f54480b6530f h1:aANCCkNbGzwXFh7dubh5FgvlZXuyRnZHcHZXmkRLV/A=
 github.com/Binject/debug v0.0.0-20200830173345-f54480b6530f/go.mod h1:QzgxDLY/qdKlvnbnb65eqTedhvQPbaSP2NqIbcuKvsQ=
+github.com/Binject/debug v0.0.0-20210312092933-6277045c2fdf h1:Cx4YJvjPZD91xiffqJOq8l3j1YKcvx3+8duqq7DX9gY=
+github.com/Binject/debug v0.0.0-20210312092933-6277045c2fdf/go.mod h1:QzgxDLY/qdKlvnbnb65eqTedhvQPbaSP2NqIbcuKvsQ=
 github.com/Binject/go-donut v0.0.0-20201215224200-d947cf4d090d h1:p1nbUZVkTna5JW0jUpmnXaLc9enF3CwcRisYwUuNiz4=
 github.com/Binject/go-donut v0.0.0-20201215224200-d947cf4d090d/go.mod h1:+HPTw2E7tpmDKnls6np/4DMINtku9rw3TgLtKoydgMI=
 github.com/BurntSushi/toml v0.3.1 h1:WXkYYl6Yr3qBf1K79EBnL4mak0OimBfB0XUf9Vl28OQ=
