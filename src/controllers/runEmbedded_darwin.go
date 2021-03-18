@@ -1,9 +1,5 @@
 package controllers
 
-import (
-	"fmt"
-)
-
 func EmbeddedFiles() string {
 	returnValue := ""
 	_, childrenFiles := listEmbeddedFiles()
