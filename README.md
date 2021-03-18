@@ -162,7 +162,7 @@ Running binary this way could help bypassing AV protections. Sometimes the argum
 * Ability to execute embedded binary
 * Feature for search and replace (for fill the IP address in reverse shell for example)
 * Generate oneliners to download and execute a embedded file
-* Config file [examples .Swego.yaml](./Swego.yaml)
+* Config file [examples .Swego.yaml](./src/Swego.yaml)
 
 ## Todo
 * Log file
