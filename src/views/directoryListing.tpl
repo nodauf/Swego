@@ -45,14 +45,14 @@
                   <td class="t">Directory</td>
                   <td class="dl"></td>
                </tr>
-               {{range .Children_dir}}
+               {{range .ChildrenDir}}
                <tr>
                   <td class="n directory"><a href="{{.}}/">{{.}}/</a></td>
                   <td class="t">Directory</td>
                   <td class="dl directory"><a href="{{.}}?dl">Download</a> | <a href="{{.}}?dlenc">encrypted zip (pwd: infected)</a></td>
                </tr>
                {{end}}
-               {{range .Children_files}}
+               {{range .ChildrenFiles}}
                <tr class="file">
                   {{ if $.Embedded }}
                     <td class="n"><a href="{{.}}?embedded">{{.}}</a></td>
