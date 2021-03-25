@@ -3,8 +3,8 @@
 bind: 8080
 IP: 0.0.0.0
 TLS: false
-TLSCertificate: ""
-TLSKey: ""
+Certificate: ""
+Key: ""
 DisableListing: false
 Gzip: true
 Oneliners: false
