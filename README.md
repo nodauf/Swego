@@ -165,6 +165,8 @@ Running binary this way could help bypassing AV protections. Sometimes the argum
 * Config file [examples .Swego.yaml](./src/.Swego.yaml)
 
 ## Todo
+* Webdav (with capture Net-NTLM hash)
+* Auto generate random certificate for TLS
 * Log file
 * JS/CSS menu to give command line in powershell, some lolbins, curl, wget to download and execute
 * Use regex for search and replace
