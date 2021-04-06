@@ -18,6 +18,7 @@ package main
 import (
 	"Swego/src/cmd"
 	"Swego/src/controllers"
+	"Swego/src/controllers/webdav"
 	"Swego/src/routers"
 	"fmt"
 	"log"
@@ -27,6 +28,9 @@ import (
 
 func main() {
 	cmd.Execute()
+	if cmd.Webdav {
+		go webdav.New()
+	}
 	if cmd.Web {
 		if cmd.Oneliners {
 			go controllers.CliOnelinersMenu()

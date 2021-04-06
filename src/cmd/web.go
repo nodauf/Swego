@@ -58,6 +58,12 @@ var RootFolder string
 // SearchAndReplaceMap is the map which contains the information to search and replace string by another
 var SearchAndReplaceMap = make(map[string]string)
 
+// Webdav to enable the webdav server
+var Webdav bool
+
+// Webdav to enable the webdav server
+var WebdavPort int
+
 var promptPassword bool
 var cwd string
 var searchAndReplace string
@@ -81,6 +87,8 @@ var webCmd = &cobra.Command{
 		Password = viper.GetString("Password")
 		RootFolder = viper.GetString("Root")
 		PrivateFolder = viper.GetString("Private")
+		Webdav = viper.GetBool("webdav")
+		WebdavPort = viper.GetInt("webdavPort")
 
 		promptPassword = viper.GetBool("promptPassword")
 		searchAndReplace = viper.GetString("searchAndReplace")
@@ -153,7 +161,7 @@ func init() {
 	webCmd.Flags().StringVar(&IP, "ip", "0.0.0.0", "Binding IP")
 	webCmd.Flags().BoolVarP(&Gzip, "gzip", "g", true, "Enables gzip/zlib compression")
 	webCmd.Flags().BoolVarP(&Oneliners, "oneliners", "o", false, "Generate oneliners to download files")
-	webCmd.Flags().StringVarP(&RootFolder, "root", "r", cwd, "Root folder")
+	webCmd.Flags().StringVarP(&RootFolder, "root", "r", cwd, "Root folder (for web and webdav)")
 	webCmd.Flags().StringVarP(&searchAndReplace, "searchAndReplace", "s", "", "Search and replace string in embedded text files")
 
 	webCmd.Flags().StringVarP(&Username, "username", "u", "admin", "Username for basic auth")
@@ -161,10 +169,13 @@ func init() {
 	webCmd.Flags().StringVar(&PrivateFolder, "private", cwd+"/private", "Private folder with basic auth")
 	webCmd.Flags().BoolVar(&promptPassword, "promptPassword", false, "Prompt for for basic auth's password")
 
-	webCmd.Flags().BoolVar(&TLS, "tls", false, "Enables HTTPS")
-	webCmd.Flags().StringVarP(&TLSCertificate, "certificate", "c", "", "HTTPS certificate : openssl req -new -x509 -sha256 -key server.key -out server.crt -days 365")
-	webCmd.Flags().StringVarP(&TLSKey, "key", "k", "", "HTTPS Key : openssl genrsa -out server.key 2048")
+	webCmd.Flags().BoolVar(&TLS, "tls", false, "Enables HTTPS (for web and webdav)")
+	webCmd.Flags().StringVarP(&TLSCertificate, "certificate", "c", "", "HTTPS certificate : openssl req -new -x509 -sha256 -key server.key -out server.crt -days 365 (for web and webdav)")
+	webCmd.Flags().StringVarP(&TLSKey, "key", "k", "", "HTTPS Key : openssl genrsa -out server.key 2048 (for web and webdav)")
 
 	webCmd.Flags().BoolVarP(&DisableListing, "disableListing", "d", false, "Disable directory listing")
+
+	webCmd.Flags().BoolVarP(&Webdav, "webdav", "w", false, "Enable webdav (easier for copy with windows and for capture Net-NTLM hashes")
+	webCmd.Flags().IntVar(&WebdavPort, "webdavPort", 8081, "Port for webdav")
 
 }
