@@ -52,8 +52,14 @@ func main() {
 				IdleTimeout:  5 * time.Second,
 				TLSConfig:    &cmd.TLSConfig,
 			}
-			listenTLS, _ := tls.Listen("tcp", cmd.IP+":"+bind, &cmd.TLSConfig)
+			listenTLS, err := tls.Listen("tcp", cmd.IP+":"+bind, &cmd.TLSConfig)
+			if err != nil {
+				log.Fatal("Error starting listening for the webserver: " + err.Error())
+			}
 			err = srv.Serve(listenTLS)
+			if err != nil {
+				log.Fatal("Error starting the webserver: " + err.Error())
+			}
 		} else {
 			err = http.ListenAndServe(cmd.IP+":"+bind, nil)
 		}
