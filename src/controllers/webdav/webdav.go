@@ -38,6 +38,8 @@ func New() {
 		_ = srv.Serve(listenTLS)
 		//http.ListenAndServeTLS(fmt.Sprintf(":%d", cmd.WebdavPort), cmd.TLSCertificate, cmd.TLSKey, srv)
 	}
+
+	fmt.Printf("Sharing with webdav %s on %s:%d ...\n", cmd.RootFolder, cmd.IP, cmd.WebdavPort)
 	if err := http.ListenAndServe(fmt.Sprintf(":%d", cmd.WebdavPort), srv); err != nil {
 		log.Fatalf("Error with WebDAV server: %v", err)
 	}
