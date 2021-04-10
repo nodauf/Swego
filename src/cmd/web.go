@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"Swego/src/utils"
+	"crypto/tls"
 	"errors"
 	"fmt"
 	"os"
@@ -29,10 +30,10 @@ var IP string
 var TLS bool
 
 // TLSCertificate is the tls certificate
-var TLSCertificate string
+var tlsCertificate string
 
 // TLSKey is the tls key
-var TLSKey string
+var tlsKey string
 
 // DisableListing : option to disable directory listing
 var DisableListing bool
@@ -58,6 +59,12 @@ var RootFolder string
 // SearchAndReplaceMap is the map which contains the information to search and replace string by another
 var SearchAndReplaceMap = make(map[string]string)
 
+// TLSConfig contains the configuration for the webserver
+var TLSConfig tls.Config
+
+// cert contains certificate and private key
+var cert *tls.Certificate
+
 var promptPassword bool
 var cwd string
 var searchAndReplace string
@@ -72,8 +79,8 @@ var webCmd = &cobra.Command{
 		Bind = viper.GetInt("bind")
 		IP = viper.GetString("IP")
 		TLS = viper.GetBool("TLS")
-		TLSCertificate = viper.GetString("Certificate")
-		TLSKey = viper.GetString("Key")
+		tlsCertificate = viper.GetString("Certificate")
+		tlsKey = viper.GetString("Key")
 		DisableListing = viper.GetBool("DisableListing")
 		Gzip = viper.GetBool("Gzip")
 		Oneliners = viper.GetBool("Oneliners")
@@ -84,12 +91,27 @@ var webCmd = &cobra.Command{
 
 		promptPassword = viper.GetBool("promptPassword")
 		searchAndReplace = viper.GetString("searchAndReplace")
-		if (TLS || TLSKey != "" || TLSCertificate != "") && (!TLS || TLSKey == "" || TLSCertificate == "") {
+
+		if TLS && (tlsKey == "" || tlsCertificate == "") {
+			var err error
+			cert, err = utils.GenerateTLSCertificate("")
+			if err != nil {
+				return errors.New("Error while generating certificate: " + err.Error())
+			}
+			TLSConfig.Certificates = append(TLSConfig.Certificates, *cert)
+		} else if (TLS || tlsKey != "" || tlsCertificate != "") && (!TLS || tlsKey == "" || tlsCertificate == "") {
 			return errors.New("Tls, certificate and/or key arguments missing")
 
-		} else if TLS && (!utils.FileExists(TLSCertificate) || !utils.FileExists(TLSKey)) { //if TLS enable check if the certificate and key files not exist
-			return errors.New("Certificate file " + TLSCertificate + " or key file " + TLSKey + " not found")
+		} else if TLS && (!utils.FileExists(tlsCertificate) || !utils.FileExists(tlsKey)) { //if TLS enable check if the certificate and key files not exist
+			return errors.New("Certificate file " + tlsCertificate + " or key file " + tlsKey + " not found")
 
+		} else {
+			cer, err := tls.LoadX509KeyPair("server.crt", "server.key")
+			if err != nil {
+				return errors.New(err.Error())
+			}
+			cert = &cer
+			TLSConfig.Certificates = append(TLSConfig.Certificates, *cert)
 		}
 
 		return nil
@@ -161,9 +183,9 @@ func init() {
 	webCmd.Flags().StringVar(&PrivateFolder, "private", cwd+"/private", "Private folder with basic auth")
 	webCmd.Flags().BoolVar(&promptPassword, "promptPassword", false, "Prompt for for basic auth's password")
 
-	webCmd.Flags().BoolVar(&TLS, "tls", false, "Enables HTTPS")
-	webCmd.Flags().StringVarP(&TLSCertificate, "certificate", "c", "", "HTTPS certificate : openssl req -new -x509 -sha256 -key server.key -out server.crt -days 365")
-	webCmd.Flags().StringVarP(&TLSKey, "key", "k", "", "HTTPS Key : openssl genrsa -out server.key 2048")
+	webCmd.Flags().BoolVar(&TLS, "tls", false, "Enables HTTPS (for web and webdav)")
+	webCmd.Flags().StringVarP(&tlsCertificate, "certificate", "c", "", "HTTPS certificate : openssl req -new -x509 -sha256 -key server.key -out server.crt -days 365 (for web and webdav)")
+	webCmd.Flags().StringVarP(&tlsKey, "key", "k", "", "HTTPS Key : openssl genrsa -out server.key 2048 (for web and webdav)")
 
 	webCmd.Flags().BoolVarP(&DisableListing, "disableListing", "d", false, "Disable directory listing")
 

@@ -19,10 +19,12 @@ import (
 	"Swego/src/cmd"
 	"Swego/src/controllers"
 	"Swego/src/routers"
+	"crypto/tls"
 	"fmt"
 	"log"
 	"net/http"
 	"strconv"
+	"time"
 )
 
 func main() {
@@ -42,7 +44,16 @@ func main() {
 		var err error
 		// Check if HTTPS or not
 		if cmd.TLS {
-			err = http.ListenAndServeTLS(cmd.IP+":"+bind, cmd.TLSCertificate, cmd.TLSKey, nil)
+
+			srv := &http.Server{
+				Addr:         cmd.IP + ":" + bind,
+				WriteTimeout: 0,
+				ReadTimeout:  0,
+				IdleTimeout:  5 * time.Second,
+				TLSConfig:    &cmd.TLSConfig,
+			}
+			listenTLS, _ := tls.Listen("tcp", cmd.IP+":"+bind, &cmd.TLSConfig)
+			err = srv.Serve(listenTLS)
 		} else {
 			err = http.ListenAndServe(cmd.IP+":"+bind, nil)
 		}
