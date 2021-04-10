@@ -150,7 +150,7 @@ Running binary this way could help bypassing AV protections. Sometimes the argum
 
 ## Features
 
-* HTTPS
+* HTTPS (auto generate certificate / key if no certificate / key specified)
 * Directory listing
 * Define a private folder with basic authentication
 * Upload multiple files
