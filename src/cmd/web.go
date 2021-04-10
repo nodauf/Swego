@@ -61,8 +61,11 @@ var SearchAndReplaceMap = make(map[string]string)
 // Webdav to enable the webdav server
 var Webdav bool
 
-// Webdav to enable the webdav server
+// WebdavPort is the port to serve the webdav
 var WebdavPort int
+
+// WebdavNTLM enable the capture of NetNTLM hashes
+var WebdavNTLM bool
 
 var promptPassword bool
 var cwd string
@@ -177,5 +180,6 @@ func init() {
 
 	webCmd.Flags().BoolVarP(&Webdav, "webdav", "w", false, "Enable webdav (easier for copy with windows and for capture Net-NTLM hashes")
 	webCmd.Flags().IntVar(&WebdavPort, "webdavPort", 8081, "Port for webdav")
+	webCmd.Flags().BoolVarP(&WebdavNTLM, "webdavNTLM", "n", false, "Enable NTLM authentication (Useful to collect NetNTLM hashes)")
 
 }
