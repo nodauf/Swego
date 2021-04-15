@@ -105,8 +105,8 @@ var webCmd = &cobra.Command{
 		} else if TLS && (!utils.FileExists(tlsCertificate) || !utils.FileExists(tlsKey)) { //if TLS enable check if the certificate and key files not exist
 			return errors.New("Certificate file " + tlsCertificate + " or key file " + tlsKey + " not found")
 
-		} else {
-			cer, err := tls.LoadX509KeyPair("server.crt", "server.key")
+		} else if TLS && utils.FileExists(tlsCertificate) && utils.FileExists(tlsKey){
+			cer, err := tls.LoadX509KeyPair(tlsCertificate, tlsKey)
 			if err != nil {
 				return errors.New(err.Error())
 			}
