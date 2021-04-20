@@ -3,6 +3,8 @@
 Swiss army knife Webserver in Golang.
 Keep simple like the python SimpleHTTPServer but with many features
 
+![Swego screenshot](./images/swego.png)
+
 ## Usage
 
 ### Run the binary
