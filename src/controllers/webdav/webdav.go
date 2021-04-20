@@ -13,7 +13,7 @@ import (
 )
 
 func New() {
-	srv := &webdav.Handler{
+	srv := &CustomHandler{
 		FileSystem: webdav.Dir(cmd.RootFolder),
 		LockSystem: webdav.NewMemLS(),
 		Logger: func(r *http.Request, err error) {
@@ -43,5 +43,4 @@ func New() {
 	if err := http.ListenAndServe(fmt.Sprintf(":%d", cmd.WebdavPort), srv); err != nil {
 		log.Fatalf("Error with WebDAV server: %v", err)
 	}
-
 }
