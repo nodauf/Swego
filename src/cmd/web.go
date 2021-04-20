@@ -179,7 +179,7 @@ func init() {
 	webCmd.Flags().BoolVarP(&DisableListing, "disableListing", "d", false, "Disable directory listing")
 
 	webCmd.Flags().BoolVarP(&Webdav, "webdav", "w", false, "Enable webdav (easier for copy with windows and for capture Net-NTLM hashes")
-	webCmd.Flags().IntVar(&WebdavPort, "webdavPort", 8081, "Port for webdav")
+	webCmd.Flags().IntVar(&WebdavPort, "webdavPort", 8888, "Port for webdav")
 	webCmd.Flags().BoolVarP(&WebdavNTLM, "webdavNTLM", "n", false, "Enable NTLM authentication (Useful to collect NetNTLM hashes)")
 
 }
