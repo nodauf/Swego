@@ -165,10 +165,10 @@ Running binary this way could help bypassing AV protections. Sometimes the argum
 * Feature for search and replace (for fill the IP address in reverse shell for example)
 * Generate oneliners to download and execute a embedded file
 * Config file [examples .Swego.yaml](./src/.Swego.yaml)
+* Auto generate random certificate for TLS
 
 ## Todo
 * Webdav (with capture Net-NTLM hash)
-* Auto generate random certificate for TLS
 * Log file
 * JS/CSS menu to give command line in powershell, some lolbins, curl, wget to download and execute
 * Use regex for search and replace
