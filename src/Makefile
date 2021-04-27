@@ -1,5 +1,6 @@
-build:
-	go build -o bin/webserver webserver.go
+build: assetsDir
+	go build -ldflags="-s -w" -o bin/webserver webserver.go
+	rm controllers/rice-box.go
 
 run:
 	go run webserver.go
