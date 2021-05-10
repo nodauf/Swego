@@ -7,7 +7,7 @@ require (
 	github.com/Binject/go-donut v0.0.0-20201215224200-d947cf4d090d
 	github.com/C-Sto/BananaPhone v0.0.0-20201003062936-916e63b713df
 	github.com/GeertJohan/go.rice v1.0.2
-	github.com/gabriel-vasile/mimetype v1.2.0
+	github.com/gabriel-vasile/mimetype v1.3.0
 	github.com/google/uuid v1.2.0 // indirect
 	github.com/manifoldco/promptui v0.8.0
 	github.com/mitchellh/go-homedir v1.1.0
