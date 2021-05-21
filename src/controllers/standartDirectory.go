@@ -13,7 +13,7 @@ import (
 	"net/http"
 	"net/url"
 	"os"
-	"path"
+	"path/filepath"
 	"sort"
 	"strconv"
 	"strings"
@@ -31,12 +31,12 @@ const fsMaxbufsize = 4096 // 4096 bits = default page size on OSX
 func HandleFile(w http.ResponseWriter, req *http.Request) {
 	w.Header().Set("Server", serverUA)
 
-	filepath := path.Join((cmd.RootFolder), path.Clean(req.URL.Path))
+	path := filepath.Join((cmd.RootFolder), filepath.Clean(req.URL.Path))
 	if strings.Contains(req.URL.Path, "/private/") {
 		req.URL.Path = strings.Replace(req.URL.Path, "/private/", "", 1)
-		filepath = path.Join((cmd.PrivateFolder), path.Clean(req.URL.Path))
+		path = filepath.Join((cmd.PrivateFolder), filepath.Clean(req.URL.Path))
 	}
-	serveFile(filepath, w, req)
+	serveFile(path, w, req)
 
 }
 
@@ -228,7 +228,7 @@ func handleDirectory(f *os.File, w http.ResponseWriter, req *http.Request) {
 		// First, check if there is any index in this folder.
 		for _, val := range names {
 			if val.Name() == "index.html" {
-				serveFile(path.Join(f.Name(), "index.html"), w, req)
+				serveFile(filepath.Join(f.Name(), "index.html"), w, req)
 				return
 			}
 		}
@@ -291,4 +291,42 @@ func renderTemplate(w http.ResponseWriter, view string, data interface{}) error 
 	}
 	return nil
 
+}
+
+func DeleteRequest(w http.ResponseWriter, req *http.Request) {
+	path := filepath.Join((cmd.RootFolder), filepath.Clean(req.URL.Path))
+	if strings.Contains(req.URL.Path, "/private/") {
+		req.URL.Path = strings.Replace(req.URL.Path, "/private/", "", 1)
+		path = filepath.Join((cmd.PrivateFolder), filepath.Clean(req.URL.Path))
+	}
+
+	f, err := os.Open(path)
+	if err != nil {
+		http.Error(w, "404 Not Found : Can't delete the file.", 404)
+		log.Println("404 Not Found : Can't delete the file " + path)
+		return
+	}
+	statinfo, err := f.Stat()
+	if err != nil {
+		http.Error(w, "500 Internal Error : stat() failure.", 500)
+		log.Println("500 Internal Error : stat() failure for the file: " + path)
+		return
+	}
+
+	if statinfo.IsDir() { // If it's a directory, open it !
+		err := os.RemoveAll(path) // delete an entire directory
+		if err != nil {
+			http.Error(w, "500 Internal Error : Can't delete the folder", 500)
+			log.Println("500 Internal Error : Can't delete the folder:  " + path)
+		}
+		http.Redirect(w, req, filepath.Join(req.URL.Path+"/../"), 302)
+	} else {
+		err := os.Remove(path) // remove a single file
+		if err != nil {
+			http.Error(w, "500 Internal Error : Can't delete the file", 500)
+			log.Println("500 Internal Error : Can't delete the file:  " + path)
+		}
+
+		http.Redirect(w, req, filepath.Join(req.URL.Path+"/../"), 302)
+	}
 }
