@@ -49,7 +49,7 @@
                <tr>
                   <td class="n directory"><a href="{{.}}/">{{.}}/</a></td>
                   <td class="t">Directory</td>
-                  <td class="dl directory"><a href="{{.}}?dl">Download</a> | <a href="{{.}}?dlenc">encrypted zip (pwd: infected)</a></td>
+                  <td class="dl directory"><a href="{{.}}?dl">Download</a> | <a onclick="return confirm('Are you sure to delete this directory?')" href="{{.}}?delete">Delete</a> | <a href="{{.}}?dlenc">encrypted zip (pwd: infected)</a></td>
                </tr>
                {{end}}
                {{range .ChildrenFiles}}
@@ -61,7 +61,7 @@
                   {{ else }}
                     <td class="n"><a href="{{.}}">{{.}}</a></td>
                     <td class="t">&nbsp;</td>
-                    <td class="dl"><a href="{{.}}?dl">Download</a> | <a href="{{.}}?dlenc">encrypted zip (pwd: infected)</a></td>
+                    <td class="dl"><a href="{{.}}?dl">Download</a> | <a onclick="return confirm('Are you sure to delete this file?')" href="{{.}}?delete">Delete</a> | <a href="{{.}}?dlenc">encrypted zip (pwd: infected)</a></td>
                   {{ end }}
                </tr>
                {{end}}

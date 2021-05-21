@@ -12,12 +12,19 @@ func ParseHTTPParameter(w http.ResponseWriter, req *http.Request) {
 
 	if errParseQuery == nil {
 		if len(query["embedded"]) > 0 { // Manage embedded files
+
 			controllers.EmbeddedRequest(w, req)
-			return
-		} else if len(query["newFolder"]) > 0 {
-			controllers.CreateFolder(w, req)
-			return
+
+		} else {
+			if len(query["newFolder"]) > 0 {
+				controllers.CreateFolder(w, req)
+
+			} else if len(query["delete"]) > 0 {
+				controllers.DeleteRequest(w, req)
+			} else {
+
+				controllers.HandleFile(w, req)
+			}
 		}
 	}
-	controllers.HandleFile(w, req)
 }
