@@ -65,8 +65,28 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        goos: [linux, darwin]
+        goos: [linux]
         goarch: [386, amd64]
+    steps:
+    - uses: actions/checkout@v2
+    - uses: wangyoucao577/go-release-action@v1.17
+      with:
+        pre_command: "bash ./src/rice-assets.sh"
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        goos: ${{ matrix.goos }}
+        goarch: ${{ matrix.goarch }}
+        goversion: 1.16
+        project_path: "./src"
+        ldflags: "-s -w"
+        binary_name: swego-without-embedded
+        
+  releases-matrix-darwin-withoutembedded:
+    name: Release Go Binary for darwin without any embedded files
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        goos: [darwin]
+        goarch: [amd64]
     steps:
     - uses: actions/checkout@v2
     - uses: wangyoucao577/go-release-action@v1.17
