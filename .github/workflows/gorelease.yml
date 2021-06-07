@@ -13,7 +13,7 @@ jobs:
         goarch: [amd64]
     steps:
     - uses: actions/checkout@v2
-    - uses: wangyoucao577/go-release-action@v1.17
+    - uses: wangyoucao577/go-release-action@v1.18
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
         goos: ${{ matrix.goos }}
@@ -31,7 +31,7 @@ jobs:
         goarch: [386, amd64]
     steps:
     - uses: actions/checkout@v2
-    - uses: wangyoucao577/go-release-action@v1.17
+    - uses: wangyoucao577/go-release-action@v1.18
       with:
         pre_command: "bash ./src/rice-assets.sh"
         github_token: ${{ secrets.GITHUB_TOKEN }}
@@ -50,7 +50,7 @@ jobs:
         goarch: [amd64]
     steps:
     - uses: actions/checkout@v2
-    - uses: wangyoucao577/go-release-action@v1.17
+    - uses: wangyoucao577/go-release-action@v1.18
       with:
         pre_command: "bash ./src/rice-assets.sh"
         github_token: ${{ secrets.GITHUB_TOKEN }}
@@ -69,7 +69,7 @@ jobs:
         goarch: [386, amd64]
     steps:
     - uses: actions/checkout@v2
-    - uses: wangyoucao577/go-release-action@v1.17
+    - uses: wangyoucao577/go-release-action@v1.18
       with:
         pre_command: "bash ./src/rice-assets.sh"
         github_token: ${{ secrets.GITHUB_TOKEN }}
@@ -89,7 +89,7 @@ jobs:
         goarch: [amd64]
     steps:
     - uses: actions/checkout@v2
-    - uses: wangyoucao577/go-release-action@v1.17
+    - uses: wangyoucao577/go-release-action@v1.18
       with:
         pre_command: "bash ./src/rice-assets.sh"
         github_token: ${{ secrets.GITHUB_TOKEN }}
