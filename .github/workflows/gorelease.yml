@@ -15,6 +15,7 @@ jobs:
     - uses: actions/checkout@v2
     - uses: wangyoucao577/go-release-action@v1.18
       with:
+        pre_command: "bash ./src/rice-assets.sh"
         github_token: ${{ secrets.GITHUB_TOKEN }}
         goos: ${{ matrix.goos }}
         goarch: ${{ matrix.goarch }}
