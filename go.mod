@@ -4,7 +4,7 @@ go 1.15
 
 require (
 	github.com/Binject/debug v0.0.0-20210312092933-6277045c2fdf // indirect
-	github.com/Binject/go-donut v0.0.0-20201215224200-d947cf4d090d
+	github.com/Binject/go-donut v0.0.0-20210701074227-67a31e2d883e
 	github.com/C-Sto/BananaPhone v0.0.0-20201003062936-916e63b713df
 	github.com/GeertJohan/go.rice v1.0.2
 	github.com/gabriel-vasile/mimetype v1.3.0
