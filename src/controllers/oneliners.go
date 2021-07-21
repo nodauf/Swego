@@ -1,7 +1,9 @@
 package controllers
 
 import (
+	"errors"
 	"html/template"
+	"io/fs"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -33,12 +35,17 @@ func CliOnelinersMenu() {
 	templateOneliners = searchAndReaplceOneliners(templateOneliners)
 
 	// Get all the file's name recursively. Store them in sliceFiles
-	err = filepath.Walk(".",
+	err = filepath.Walk(cmd.RootFolder,
 		func(path string, info os.FileInfo, err error) error {
-			if err != nil {
+			// Ignore permission denied when iterate over files and folders
+			if errors.Is(err, fs.ErrPermission) {
+				return nil
+			} else if err != nil {
 				return err
 			}
 			if !info.IsDir() {
+				path = strings.TrimPrefix(path, cmd.RootFolder)
+				path = strings.TrimPrefix(path, "/")
 				sliceFiles = append(sliceFiles, File{Name: info.Name(), Path: path})
 			}
 			return nil
@@ -69,8 +76,9 @@ func CliOnelinersMenu() {
 	}
 
 	i, _, err := prompt.Run()
-
-	utils.Check(err, "oneliners: prompt failed")
+	if err != nil && err.Error() != "^C" {
+		utils.Check(err, "oneliners: prompt failed")
+	}
 	// Tips to define fake faint function which is a color for promptui
 	funcMap := template.FuncMap{
 		"faint": func(str string) string { return str },
