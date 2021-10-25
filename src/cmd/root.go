@@ -40,6 +40,7 @@ func Execute() {
 
 func init() {
 	cobra.OnInitialize(initConfig)
+	cobra.MousetrapHelpText = ""
 
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.Swego.yaml)")
 
