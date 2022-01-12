@@ -1,8 +1,10 @@
 package routers
 
 import (
+	"Swego/src/cmd"
 	"Swego/src/controllers"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 )
 
@@ -26,6 +28,17 @@ func Router(w http.ResponseWriter, req *http.Request) {
 		if err := req.ParseForm(); err != nil {
 			fmt.Fprintf(w, "ParseForm() err: %v", err)
 			return
+		}
+		if cmd.Verbose {
+			data, err := ioutil.ReadAll(req.Body)
+			if err == nil && len(data) > 0 {
+				fmt.Println(string(data))
+			}
+			req.ParseForm()
+			for key, value := range req.Form {
+				fmt.Printf("%s => %s \n", key, value)
+			}
+
 		}
 		controllers.UploadFile(w, req)
 

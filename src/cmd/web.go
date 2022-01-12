@@ -62,6 +62,9 @@ var SearchAndReplaceMap = make(map[string]string)
 // TLSConfig contains the configuration for the webserver
 var TLSConfig tls.Config
 
+// Verbose enable a verbose output
+var Verbose bool
+
 // cert contains certificate and private key
 var cert *tls.Certificate
 
@@ -105,7 +108,7 @@ var webCmd = &cobra.Command{
 		} else if TLS && (!utils.FileExists(tlsCertificate) || !utils.FileExists(tlsKey)) { //if TLS enable check if the certificate and key files not exist
 			return errors.New("Certificate file " + tlsCertificate + " or key file " + tlsKey + " not found")
 
-		} else if TLS && utils.FileExists(tlsCertificate) && utils.FileExists(tlsKey){
+		} else if TLS && utils.FileExists(tlsCertificate) && utils.FileExists(tlsKey) {
 			cer, err := tls.LoadX509KeyPair(tlsCertificate, tlsKey)
 			if err != nil {
 				return errors.New(err.Error())
@@ -188,5 +191,7 @@ func init() {
 	webCmd.Flags().StringVarP(&tlsKey, "key", "k", "", "HTTPS Key : openssl genrsa -out server.key 2048 (for web and webdav)")
 
 	webCmd.Flags().BoolVarP(&DisableListing, "disableListing", "d", false, "Disable directory listing")
+
+	webCmd.Flags().BoolVarP(&Verbose, "verbose", "v", false, "Verbose output")
 
 }

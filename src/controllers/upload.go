@@ -17,7 +17,6 @@ func UploadFile(w http.ResponseWriter, r *http.Request) {
 		r.URL.Path = strings.Replace(r.URL.Path, "/private/", "", 1)
 		filepath = path.Join((cmd.PrivateFolder), path.Clean(r.URL.Path))
 	}
-	fmt.Println(r.URL.Path)
 	// Maximum upload of 1000 MB files
 	r.ParseMultipartForm(10000000 << 20)
 	// If the variable files exists
