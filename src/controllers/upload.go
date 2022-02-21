@@ -47,12 +47,13 @@ func UploadFile(w http.ResponseWriter, r *http.Request) {
 				http.Error(w, err.Error(), http.StatusInternalServerError)
 				return
 			}
-			f, err := os.Open(filepath)
+			f, err := os.Open(filepath + "/" + handler.Filename)
 			defer f.Close()
 			if err != nil {
 				http.Error(w, "404 Not Found : Error while opening the file.", 404)
 				return
 			}
+			fmt.Printf("File %s have been saved\n", filepath+"/"+handler.Filename)
 		}
 		data := struct {
 			Directory string
