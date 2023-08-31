@@ -67,6 +67,7 @@ var Verbose bool
 
 // cert contains certificate and private key
 var cert *tls.Certificate
+var commonName string
 
 var promptPassword bool
 var cwd string
@@ -84,6 +85,7 @@ var webCmd = &cobra.Command{
 		TLS = viper.GetBool("TLS")
 		tlsCertificate = viper.GetString("Certificate")
 		tlsKey = viper.GetString("Key")
+		commonName = viper.GetString("CommonName")
 		DisableListing = viper.GetBool("DisableListing")
 		Gzip = viper.GetBool("Gzip")
 		Oneliners = viper.GetBool("Oneliners")
@@ -97,7 +99,7 @@ var webCmd = &cobra.Command{
 
 		if TLS && (tlsKey == "" || tlsCertificate == "") {
 			var err error
-			cert, err = utils.GenerateTLSCertificate("")
+			cert, err = utils.GenerateTLSCertificate(commonName)
 			if err != nil {
 				return errors.New("Error while generating certificate: " + err.Error())
 			}
@@ -187,6 +189,7 @@ func init() {
 	webCmd.Flags().BoolVar(&promptPassword, "promptPassword", false, "Prompt for for basic auth's password")
 
 	webCmd.Flags().BoolVar(&TLS, "tls", false, "Enables HTTPS (for web and webdav)")
+	webCmd.Flags().StringVarP(&commonName, "commonName", "n","", "Common name to use in the certificat")
 	webCmd.Flags().StringVarP(&tlsCertificate, "certificate", "c", "", "HTTPS certificate : openssl req -new -x509 -sha256 -key server.key -out server.crt -days 365 (for web and webdav)")
 	webCmd.Flags().StringVarP(&tlsKey, "key", "k", "", "HTTPS Key : openssl genrsa -out server.key 2048 (for web and webdav)")
 
