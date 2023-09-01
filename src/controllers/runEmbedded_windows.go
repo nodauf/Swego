@@ -1,15 +1,5 @@
 package controllers
 
-import (
-	"bytes"
-	"syscall"
-	"time"
-	"unsafe"
-
-	"github.com/Binject/go-donut/donut"
-	bananaphone "github.com/C-Sto/BananaPhone/pkg/BananaPhone"
-)
-
 func checkFatalErr(err error) {
 	if err != nil {
 		panic(err)
@@ -26,7 +16,8 @@ func EmbeddedFiles() string {
 }
 
 func RunEmbeddedBinary(binary string, arguments string) {
-	binaryBytes := readEmbeddedBinary(binary)
+	// feature not used. Disable it to avoid AV warning
+	/*binaryBytes := readEmbeddedBinary(binary)
 	argumentBinary := " " // trick use empty argument if no one is given
 	if arguments != "" {
 		argumentBinary = arguments
@@ -109,5 +100,5 @@ func RunEmbeddedBinary(binary string, arguments string) {
 	// bit of a hack because dunno how to wait for bananaphone background thread to complete...
 	for {
 		time.Sleep(1000000000)
-	}
+	}*/
 }
