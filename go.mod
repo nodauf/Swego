@@ -9,7 +9,7 @@ require (
 	github.com/GeertJohan/go.rice v1.0.2
 	github.com/gabriel-vasile/mimetype v1.3.1
 	github.com/google/uuid v1.2.0 // indirect
-	github.com/manifoldco/promptui v0.8.0
+	github.com/manifoldco/promptui v0.9.0
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/spf13/cobra v1.2.1
 	github.com/spf13/viper v1.8.1
