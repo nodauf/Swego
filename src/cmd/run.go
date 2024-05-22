@@ -44,7 +44,7 @@ var runCmd = &cobra.Command{
 }
 
 func init() {
-	rootCmd.AddCommand(runCmd)
+	//rootCmd.AddCommand(runCmd)
 
 	runCmd.Flags().StringVarP(&Args, "args", "a", "", "Arguments for the binary")
 	runCmd.Flags().StringVarP(&Binary, "binary", "b", "", "Binary to execute")
