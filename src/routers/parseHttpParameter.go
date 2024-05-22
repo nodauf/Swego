@@ -13,7 +13,7 @@ func ParseHTTPParameter(w http.ResponseWriter, req *http.Request) {
 	if errParseQuery == nil {
 		if len(query["embedded"]) > 0 { // Manage embedded files
 
-			controllers.EmbeddedRequest(w, req)
+			//controllers.EmbeddedRequest(w, req) embedded are disable for now
 
 		} else {
 			if len(query["newFolder"]) > 0 {

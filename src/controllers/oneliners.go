@@ -1,6 +1,8 @@
 package controllers
 
 import (
+	views "Swego/src/views"
+	_ "embed"
 	"errors"
 	"html/template"
 	"io/fs"
@@ -12,7 +14,6 @@ import (
 	"Swego/src/cmd"
 	"Swego/src/utils"
 
-	rice "github.com/GeertJohan/go.rice"
 	"github.com/manifoldco/promptui"
 )
 
@@ -25,13 +26,16 @@ type File struct {
 // CliOnelinersMenu is the menu which will print the oneliner string
 func CliOnelinersMenu() {
 	sliceFiles := []File{}
-	templateBox, err := rice.FindBox("../views/")
-	utils.Check(err, "oneliners: error while opening rice box")
+	//templateBox, err := rice.FindBox("../views/")
+
+	//utils.Check(err, "oneliners: error while opening rice box")
 
 	// get file contents as string
-	templateOneliners, err := templateBox.String("oneliners.tpl")
-	utils.Check(err, "oneliners: error while opening oneliners.tpl in rice box")
-
+	//templateOneliners, err := templateBox.String("oneliners.tpl")
+	//utils.Check(err, "oneliners: error while opening oneliners.tpl in rice box")
+	templateOnelinersBytes, err := views.GetViews("oneliners.tpl")
+	templateOneliners := string(templateOnelinersBytes)
+	utils.Check(err, "oneliners: fail to read oneliners.tpl")
 	templateOneliners = searchAndReaplceOneliners(templateOneliners)
 
 	// Get all the file's name recursively. Store them in sliceFiles

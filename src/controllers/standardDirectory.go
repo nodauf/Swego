@@ -3,6 +3,7 @@ package controllers
 import (
 	"Swego/src/cmd"
 	"Swego/src/utils"
+	"Swego/src/views"
 	"compress/gzip"
 	"compress/zlib"
 	"container/list"
@@ -19,7 +20,6 @@ import (
 	"strings"
 	"time"
 
-	rice "github.com/GeertJohan/go.rice"
 	"github.com/gabriel-vasile/mimetype"
 	"github.com/yeka/zip"
 )
@@ -32,6 +32,7 @@ func HandleFile(w http.ResponseWriter, req *http.Request) {
 	w.Header().Set("Server", serverUA)
 
 	path := filepath.Join((cmd.RootFolder), filepath.Clean(req.URL.Path))
+
 	if strings.Contains(req.URL.Path, "/private/") {
 		req.URL.Path = strings.Replace(req.URL.Path, "/private/", "", 1)
 		path = filepath.Join((cmd.PrivateFolder), filepath.Clean(req.URL.Path))
@@ -268,17 +269,21 @@ func handleDirectory(f *os.File, w http.ResponseWriter, req *http.Request) {
 }
 
 func renderTemplate(w http.ResponseWriter, view string, data interface{}) error {
-	templateBox, err := rice.FindBox("../views/")
-	if err != nil {
-		log.Fatal(err)
-	}
+	//templateBox, err := rice.FindBox("../views/")
+	//if err != nil {
+	//	log.Fatal(err)
+	//}
 	// get file contents as string
-	templateString, err := templateBox.String(view)
+	//templateString, err := templateBox.String(view)
+	//if err != nil {
+	//	log.Fatal(err)
+	//}
+	//tpl := template.Must(template.Parse(templateString))
+	content, err := views.GetViews(view)
 	if err != nil {
 		log.Fatal(err)
 	}
-	//tpl := template.Must(template.Parse(templateString))
-	tpl, err := template.New("tpl").Parse(templateString)
+	tpl, err := template.New("tpl").Parse(string(content))
 	if err != nil {
 		http.Error(w, "500 Internal Error : Error while generating directory listing.", 500)
 		fmt.Println(err)

@@ -12,7 +12,6 @@ import (
 	"runtime"
 	"strings"
 
-	rice "github.com/GeertJohan/go.rice"
 	"github.com/yeka/zip"
 )
 
@@ -88,7 +87,7 @@ func ParseRange(data string) int64 {
 	return stop
 }
 
-//AddfiletoZip will add a file to a zip file
+// AddfiletoZip will add a file to a zip file
 func AddfiletoZip(path string, f *os.File, zipw *zip.Writer, encrypted bool, password string) {
 	filePathName := f.Name()
 
@@ -116,45 +115,59 @@ func AddfiletoZip(path string, f *os.File, zipw *zip.Writer, encrypted bool, pas
 	return
 }
 
-// AddRicefiletoZip add a embedded file (rice file) to a zip
-func AddRicefiletoZip(path string, f *rice.File, filePathName string, zipw *zip.Writer, encrypted bool, password string) {
-	//        body, err := ioutil.ReadFile(filePathName)
-	statInfo, err := f.Stat()
-	if err != nil {
-		log.Println("500 Internal Error : stat() failure for the file: " + filePathName)
-		return
-	}
-	buf := make([]byte, statInfo.Size())
-	var body []byte
-	//		n := 0
-	for err == nil {
-		_, err = f.Read(buf)
-		body = append(body, buf...)
-		//output_writer.Write(body[0:n])
-	}
+func PathSubElem(parent, sub string) (bool, error) {
+	up := ".." + string(os.PathSeparator)
 
-	//        if err != nil {
-	//            log.Fatalf("unable to read file: %v", err)
-	//        }
-
-	//Create the file to the zip zipw
-	var w io.Writer
-	if encrypted {
-		w, err = zipw.Encrypt(path, password, zip.StandardEncryption)
-	} else {
-		w, err = zipw.Create(path)
-	}
+	// path-comparisons using filepath.Abs don't work reliably according to docs (no unique representation).
+	rel, err := filepath.Rel(parent, sub)
 	if err != nil {
-		log.Fatal(err)
+		return false, err
 	}
-	// Copy the data of the local file f into the zip
-	_, err = io.Copy(w, bytes.NewReader(body))
-	if err != nil {
-		log.Fatal(err)
+	if !strings.HasPrefix(rel, up) && rel != ".." {
+		return true, nil
 	}
-	zipw.Flush()
-	return
+	return false, nil
 }
+
+// AddRicefiletoZip add a embedded file (rice file) to a zip
+//func AddRicefiletoZip(path string, f *rice.File, filePathName string, zipw *zip.Writer, encrypted bool, password string) {
+//	//        body, err := ioutil.ReadFile(filePathName)
+//	statInfo, err := f.Stat()
+//	if err != nil {
+//		log.Println("500 Internal Error : stat() failure for the file: " + filePathName)
+//		return
+//	}
+//	buf := make([]byte, statInfo.Size())
+//	var body []byte
+//	//		n := 0
+//	for err == nil {
+//		_, err = f.Read(buf)
+//		body = append(body, buf...)
+//		//output_writer.Write(body[0:n])
+//	}
+//
+//	//        if err != nil {
+//	//            log.Fatalf("unable to read file: %v", err)
+//	//        }
+//
+//	//Create the file to the zip zipw
+//	var w io.Writer
+//	if encrypted {
+//		w, err = zipw.Encrypt(path, password, zip.StandardEncryption)
+//	} else {
+//		w, err = zipw.Create(path)
+//	}
+//	if err != nil {
+//		log.Fatal(err)
+//	}
+//	// Copy the data of the local file f into the zip
+//	_, err = io.Copy(w, bytes.NewReader(body))
+//	if err != nil {
+//		log.Fatal(err)
+//	}
+//	zipw.Flush()
+//	return
+//}
 
 // FileExists checks if a file exists and is not a directory before we
 // try using it to prevent further errors.

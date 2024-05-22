@@ -5,7 +5,7 @@ Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
-    http://www.apache.org/licenses/LICENSE-2.0
+	http://www.apache.org/licenses/LICENSE-2.0
 
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
@@ -35,7 +35,7 @@ func main() {
 		}
 
 		bind := strconv.Itoa(cmd.Bind)
-		http.Handle("/", routers.Use(routers.Router))
+		http.Handle("/", routers.Use(routers.Router, controllers.BasicAuth))
 		fmt.Printf("Sharing %s on %s:%s ...\n", cmd.RootFolder, cmd.IP, bind)
 		if cmd.PrivateFolder != "" {
 			http.Handle("/private/", routers.Use(routers.Router, controllers.BasicAuth))
@@ -66,11 +66,11 @@ func main() {
 		if err != nil {
 			log.Fatal("ListenAndServe: ", err)
 		}
-	} else if cmd.Run {
-		if cmd.Binary != "" {
-			controllers.RunEmbeddedBinary(cmd.Binary, cmd.Args)
-		} else {
-			fmt.Println(controllers.EmbeddedFiles())
-		}
-	}
+	} //else if cmd.Run {
+	//if cmd.Binary != "" {
+	//controllers.RunEmbeddedBinary(cmd.Binary, cmd.Args)
+	//} else {
+	//fmt.Println(controllers.EmbeddedFiles())
+	//	}
+	//}
 }
