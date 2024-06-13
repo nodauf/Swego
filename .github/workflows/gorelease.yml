@@ -28,7 +28,7 @@ jobs:
         with:
           distribution: goreleaser
           version: latest
-          args: release --rm-dist
+          args: release
           workdir: src
         env:
           CGO_ENABLED: 0
