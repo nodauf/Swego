@@ -31,4 +31,5 @@ jobs:
           args: release --rm-dist
           workdir: src
         env:
+          CGO_ENABLED: 0
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
