@@ -99,11 +99,15 @@ var webCmd = &cobra.Command{
 
 		if TLS && (tlsKey == "" || tlsCertificate == "") {
 			var err error
-			cert, err = utils.GenerateTLSCertificate(commonName)
-			if err != nil {
-				return errors.New("Error while generating certificate: " + err.Error())
+			if commonName == "" {
+				cert, err = utils.GenerateTLSSelfSignedCertificate(commonName)
+				if err != nil {
+					return errors.New("Error while generating certificate: " + err.Error())
+				}
+				TLSConfig.Certificates = append(TLSConfig.Certificates, *cert)
+			} else {
+				TLSConfig, err = utils.GenerateTLSLetsencryptCertificate(commonName)
 			}
-			TLSConfig.Certificates = append(TLSConfig.Certificates, *cert)
 		} else if (TLS || tlsKey != "" || tlsCertificate != "") && (!TLS || tlsKey == "" || tlsCertificate == "") {
 			return errors.New("Tls, certificate and/or key arguments missing")
 
@@ -189,7 +193,7 @@ func init() {
 	webCmd.Flags().BoolVar(&promptPassword, "promptPassword", false, "Prompt for for basic auth's password")
 
 	webCmd.Flags().BoolVar(&TLS, "tls", false, "Enables HTTPS (for web and webdav)")
-	webCmd.Flags().StringVarP(&commonName, "commonName", "n","", "Common name to use in the certificat")
+	webCmd.Flags().StringVarP(&commonName, "commonName", "n", "", "Common name to use in the certificat")
 	webCmd.Flags().StringVarP(&tlsCertificate, "certificate", "c", "", "HTTPS certificate : openssl req -new -x509 -sha256 -key server.key -out server.crt -days 365 (for web and webdav)")
 	webCmd.Flags().StringVarP(&tlsKey, "key", "k", "", "HTTPS Key : openssl genrsa -out server.key 2048 (for web and webdav)")
 

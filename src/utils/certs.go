@@ -6,12 +6,17 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"crypto/x509/pkix"
+	"fmt"
+	"log"
 	"math/big"
+	"net/http"
 	"time"
+
+	"golang.org/x/crypto/acme/autocert"
 )
 
 // Credits: https://github.com/kgretzky/pwndrop/blob/master/core/gen_cert.go
-func GenerateTLSCertificate(common string) (*tls.Certificate, error) {
+func GenerateTLSSelfSignedCertificate(common string) (*tls.Certificate, error) {
 	private_key, err := rsa.GenerateKey(rand.Reader, 2048)
 	if err != nil {
 		return nil, err
@@ -56,6 +61,31 @@ func GenerateTLSCertificate(common string) (*tls.Certificate, error) {
 		Certificate: [][]byte{cert},
 		PrivateKey:  private_key,
 	}
+	return ret_tls, nil
+}
+
+func GenerateTLSLetsencryptCertificate(common string) (tls.Config, error) {
+	fmt.Printf("Generating certificate for %s\n", common)
+	certManager := autocert.Manager{
+		Prompt:     autocert.AcceptTOS,
+		HostPolicy: autocert.HostWhitelist(common), //Your domain here
+		Cache:      autocert.DirCache("certs"),     //Folder for storing certificates
+	}
+	ret_tls := tls.Config{
+		GetCertificate: certManager.GetCertificate,
+	}
+	go func() {
+		srv := &http.Server{
+			Addr:         ":80",
+			Handler:      certManager.HTTPHandler(nil),
+			IdleTimeout:  time.Minute,
+			ReadTimeout:  5 * time.Second,
+			WriteTimeout: 10 * time.Second,
+		}
+
+		err := srv.ListenAndServe()
+		log.Fatal(err)
+	}()
 	return ret_tls, nil
 }
 
