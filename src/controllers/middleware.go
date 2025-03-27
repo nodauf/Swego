@@ -4,6 +4,7 @@ import (
 	"Swego/src/cmd"
 	"Swego/src/utils"
 	"encoding/base64"
+	"log"
 	"net/http"
 	"path/filepath"
 	"strings"
@@ -44,6 +45,20 @@ func BasicAuth(h http.HandlerFunc) http.HandlerFunc {
 			//fmt.Println("Serving: "+ path.Join((*Private), path.Clean(r.URL.Path)))
 			//		h.ServeHTTP(w, r)
 			//HandleFile(w, r)
+		}
+		h(w, r)
+	}
+}
+
+// BasicAuth function to handle private directory and print basic authentication
+func IPFiltering(h http.HandlerFunc) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		var remoteIP string
+		remoteIP = strings.Split(r.RemoteAddr, ":")[0]
+		if len(cmd.IPWhitelist) > 0 && !utils.StringInSlice(cmd.IPWhitelist, remoteIP) {
+			log.Printf("Request from %s not in slice %+v\n", remoteIP, cmd.IPWhitelist)
+			http.Error(w, "Not authorized", 401)
+			return
 		}
 		h(w, r)
 	}

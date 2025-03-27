@@ -249,3 +249,13 @@ func Check(e error, customMessage string) {
 		panic(e)
 	}
 }
+
+// StringInSlice returns true if the string is present in the slice, otherwise false
+func StringInSlice(sliceStr []string, str string) bool {
+	for _, value := range sliceStr {
+		if value == str {
+			return true
+		}
+	}
+	return false
+}

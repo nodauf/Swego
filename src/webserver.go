@@ -35,10 +35,10 @@ func main() {
 		}
 
 		bind := strconv.Itoa(cmd.Bind)
-		http.Handle("/", routers.Use(routers.Router, controllers.BasicAuth))
+		http.Handle("/", routers.Use(routers.Router, controllers.IPFiltering, controllers.BasicAuth))
 		fmt.Printf("Sharing %s on %s:%s ...\n", cmd.RootFolder, cmd.IP, bind)
 		if cmd.PrivateFolder != "" {
-			http.Handle("/private/", routers.Use(routers.Router, controllers.BasicAuth))
+			http.Handle("/private/", routers.Use(routers.Router, controllers.IPFiltering, controllers.BasicAuth))
 			fmt.Printf("Sharing private %s on %s:%s ...\n", cmd.PrivateFolder, cmd.IP, bind)
 		}
 		var err error
