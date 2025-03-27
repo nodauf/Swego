@@ -26,6 +26,9 @@ var Bind int
 // IP where the webserver will listen
 var IP string
 
+// IPWhitelist contains the list of whitelister IP allowed to access the application
+var IPWhitelist []string
+
 // TLS : bool if TLS is enabled or not
 var TLS bool
 
@@ -191,6 +194,7 @@ func init() {
 	webCmd.Flags().StringVarP(&Password, "password", "p", "notsecure", "Password for basic auth")
 	webCmd.Flags().StringVar(&PrivateFolder, "private", cwd+"/private", "Private folder with basic auth")
 	webCmd.Flags().BoolVar(&promptPassword, "promptPassword", false, "Prompt for for basic auth's password")
+	webCmd.Flags().StringSliceVar(&IPWhitelist, "ipWhitelist", []string{}, "List of IP addresses to whitelist")
 
 	webCmd.Flags().BoolVar(&TLS, "tls", false, "Enables HTTPS (for web and webdav)")
 	webCmd.Flags().StringVarP(&commonName, "commonName", "n", "", "Common name to use in the certificat")
